@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 
@@ -47,6 +49,15 @@ public class Game {
             } catch (IOException e){
                 e.printStackTrace();
             }
+        }
+    }
+
+    public String fileContents(String fileName) throws IOException {
+        try{
+            return Files.readString(Path.of(fileName));
+        } catch (IOException e){
+            e.printStackTrace();
+            return null;
         }
     }
 
