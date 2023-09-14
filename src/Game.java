@@ -1,14 +1,17 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-
 public class Game {
     private HashMap<String, Line> lineHashMap;
+
+    public static final String moveFile = "move_file";
+    public static final String goFile = "groupname.go";
+    public static final String passFile = "groupname.pass";
+    public static final String endFile = "end_game";
 
     public Game() {
 
@@ -52,6 +55,12 @@ public class Game {
         }
     }
 
+    /**
+     * Get the contents of a file as a string
+     * @param fileName File to read
+     * @return String containing the file's message
+     * @throws IOException Error if file DNE or is directory
+     */
     public String fileContents(String fileName) throws IOException {
         try{
             return Files.readString(Path.of(fileName));
