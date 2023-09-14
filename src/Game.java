@@ -5,6 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Game {
+    public static void main(String[] args) 
+    {
+            System.out.println("Hello World");
+    }
+
     public Line[][] vs;
     public Line[][] hs;
     public Box[][] boxes;
