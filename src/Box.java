@@ -16,7 +16,7 @@ public class Box {
      * @return True if the box is completed
      */
     public boolean isComplete(){
-        return north.isComplete && east.isComplete && south.isComplete && west.isComplete;
+        return north.isComplete() && east.isComplete() && south.isComplete() && west.isComplete();
     }
 
     /**
@@ -24,7 +24,7 @@ public class Box {
      * @return True if the box can be completed
      */
     public boolean isOneLineAway(){
-        return (north.isComplete ? 1 : 0) + (east.isComplete ? 1 : 0) + (south.isComplete ? 1 : 0) + (west.isComplete ? 1 : 0) == 3;
+        return (north.isComplete() ? 1 : 0) + (east.isComplete() ? 1 : 0) + (south.isComplete() ? 1 : 0) + (west.isComplete() ? 1 : 0) == 3;
     }
 
 }
