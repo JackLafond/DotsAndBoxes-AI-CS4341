@@ -3,10 +3,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 
 public class Game {
-    private HashMap<String, Line> lineHashMap;
+    public Line[][] vs;
+    public Line[][] hs;
+    public Box[][] boxes;
 
     public static final String moveFile = "move_file";
     public static final String goFile = "groupname.go";
@@ -14,7 +15,32 @@ public class Game {
     public static final String endFile = "end_game";
 
     public Game() {
+        this.vs = new Line[10][9];
+        this.hs = new Line[9][10];
+        this.boxes = new Box[9][9];
 
+        initLines();
+        initBoxes();
+
+    }
+
+    private void initBoxes() {
+
+        for(int i = 0; i <= 8; i++) {
+            for(int j = 0; j <= 8; j++) {
+                this.boxes[j][i] = new Box(this.hs[j][i + 1], this.vs[j + 1][i], this.hs[j][i], this.vs[j][i]);
+            }
+        }
+    }
+
+    private void initLines() {
+
+        for(int i = 0; i <= 9; i++) {
+            for(int j = 0; j <= 10; j++) {
+                this.hs[j][i] = new Line();
+                this.vs[i][j] = new Line();
+            }
+        }
     }
 
     /**
@@ -70,10 +96,6 @@ public class Game {
         }
     }
 
-
-    public void init() {
-        this.lineHashMap = new HashMap<>();
-    }
 
     /**
      * Fill the line hashmap with instances of lines
