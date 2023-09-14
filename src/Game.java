@@ -109,6 +109,35 @@ public class Game {
         }
     }
 
+    public int[] coordSanitization(String move){
+        int[] coordVals = new int[4];
+
+        String coords = move.substring(move.length() - 7);
+        String coord1 = coords.substring(0,3);
+        String coord2 = coords.substring(4);
+
+        String[] parts1 = coord1.split(",");
+        String[] parts2 = coord2.split(",");
+
+        int x1 = Integer.parseInt(parts1[0]);
+        int y1 = Integer.parseInt(parts1[1]);
+        int x2 = Integer.parseInt(parts2[0]);
+        int y2 = Integer.parseInt(parts2[1]);
+
+        if(x2-x1 < 0 || y2-y1 < 0){
+            coordVals[0] = x2;
+            coordVals[1] = y2;
+            coordVals[2] = x1;
+            coordVals[3] = y1;
+        } else{
+            coordVals[0] = x1;
+            coordVals[1] = y1;
+            coordVals[2] = x2;
+            coordVals[3] = y2;
+        }
+
+        return coordVals;
+    }
 
 }
 
