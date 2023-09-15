@@ -5,14 +5,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class Game {
+
     public static void main(String[] args) 
     {
-            System.out.println("Hello World");
+            System.out.println("Starting Game...");
+            Game game = new Game();
+            game.hs[1][1].setComplete(true);
+            game.hs[0][0].setComplete(true);
+            game.hs[4][6].setComplete(true);
+            game.vs[1][1].setComplete(true);
+            game.vs[0][0].setComplete(true);
+            game.vs[6][6].setComplete(true);
+            game.printBoard();
     }
 
     public Line[][] vs;
     public Line[][] hs;
     public Box[][] boxes;
+
+    
 
     public static final String moveFile = "move_file";
     public static final String goFile = "groupname.go";
@@ -23,10 +34,30 @@ public class Game {
         this.vs = new Line[10][9];
         this.hs = new Line[9][10];
         this.boxes = new Box[9][9];
-
+        
         initLines();
         initBoxes();
 
+    }
+
+    private void printBoard(){
+        for(int i = 0; i < 9; i++){
+            for(int j = 0; j < 9; j++){
+                System.out.print(".");
+                if(hs[i][j].isComplete()) System.out.print("-------");
+                else System.out.print("\t");
+            }
+            System.out.print("\n");
+            if(i < 8){
+                for(int h =0; h < 3; h++){
+                    for(int horisontal=0; horisontal <9; horisontal++){
+                        if(vs[i][horisontal].isComplete()) System.out.print("|\t");
+                        else System.out.print(" \t");
+                    }
+                    System.out.print("\n");
+                }
+            }
+        }
     }
 
     private void initBoxes() {
@@ -40,10 +71,10 @@ public class Game {
 
     private void initLines() {
 
-        for(int i = 0; i <= 9; i++) {
-            for(int j = 0; j <= 10; j++) {
-                this.hs[j][i] = new Line();
-                this.vs[i][j] = new Line();
+        for(int i = 0; i < 9; i++) {
+            for(int j = 0; j < 10; j++) {
+                this.vs[j][i] = new Line();
+                this.hs[i][j] = new Line();
             }
         }
     }
