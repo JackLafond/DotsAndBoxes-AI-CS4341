@@ -61,17 +61,6 @@ public class Game {
         }
     }
 
-    private int evaluateBoard(){
-        int value = 0;
-        for(int i = 0; i < 9; i++){
-            for(int j = 0; j < 9; j++){
-                if(boxes[i][j].isCaptured() == 1) value++;
-                else if(boxes[i][j].isCaptured() == 2) value--;
-            }   
-        }
-        return value;
-    }
-
     private void initBoxes() {
 
         for(int i = 0; i <= 8; i++) {
