@@ -24,6 +24,7 @@ public class Game {
     public Box[][] boxes;
 
     
+    public Board board;
 
     public static final String moveFile = "move_file";
     public static final String goFile = "groupname.go";
@@ -88,6 +89,9 @@ public class Game {
                 this.hs[i][j] = new Line();
             }
         }
+        
+        this.board = new Board();
+
     }
 
     /**
