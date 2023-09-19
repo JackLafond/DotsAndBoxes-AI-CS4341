@@ -44,17 +44,18 @@ public class Gameplay {
                         String fileName = filePath.getFileName().toString();
 
                         if(fileName.equals(goFile)){
+                            //TODO: Make a move here
+
                             //-----------------------------------------
                             System.out.println("GO File Detected!\n");
                             //-----------------------------------------
 
-                            //Make a move here
-                            //Log opponents Move info here
+                            //TODO: Log opponents Move info here, make into a single func (used 2x)
                             String oppMove = fileContents(moveFile);
                             //int[] oppCoords = coordSanitization(oppMove);
                             //functionToStoreData(oppCoords);
 
-                            //Calculate Move
+                            //TODO: Calculate Move
                             //CalculateMoveCoords()
                             String ourMove = "dannydevito 1,1 1,2";
 
@@ -64,20 +65,20 @@ public class Gameplay {
                         }
                         else if (fileName.equals(passFile)){
 
-                            //Pass here, make empty move
+                            //TODO: Pass here, make empty move
 
                             //-----------------------------------------
                             System.out.println("PASS File Detected!\n");
                             //-----------------------------------------
 
-                            //Log opponents Move info here
+                            //TODO: Log opponents Move info here, make into a single func (used 2x)
                             String oppMove = fileContents(moveFile);
                             int[] oppCoords = coordSanitization(oppMove);
                             //functionToStoreData(oppCoords);
 
+                            //Write Empty move to moveFile
                             String passMove = "dannydevito 0,0 0,0";
                             overwriteFile(moveFile, passMove);
-
 
                         }
                     }
