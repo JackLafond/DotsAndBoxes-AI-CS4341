@@ -28,17 +28,14 @@ public class Board {
 		return this.boardState;
 	}
 
-	//Updates Player Score
 	public void updateplayerscore (int score) {
 		this.playerscore += score;
 	}
 
-	//Updates AI Score
 	public void updateaiscore (int score) {
 		this.aiscore += score;
 	}
 
-	//Checks if current move is a move for AI
 	public boolean isAIMove () {
 		return this.aimove;
 	}
@@ -67,105 +64,7 @@ public class Board {
 		System.out.println();
 	}
 
-	//Runs through the board after a move has been and checks if score needs to be updated
 	public void updatescore (int row, int col, String direction) {
-
-		if (direction.equals("horizontal")) {
-
-			//If horizontal line is placed anywhere at the top of the board, then it just has to check if a box has been made below
-			if (row == 0) {
-				if (boardState[row+1][col-1] == 11 && boardState[row+1][col+1] == 11 && boardState[row+2][col] == 9) {
-					if (aimove) {
-						updateaiscore(boardState[row+1][col]);
-					}
-					else {
-						updateplayerscore(boardState[row+1][col]);
-					}
-				}
-			}
-
-			//If horizontal line is placed anywhere at the bottom of the board, then it just has to check if a box has been made above
-			else if (row == BOARD_SIZE - 1) {
-				if (boardState[row-1][col-1] == 11 && boardState[row-1][col+1] == 11 && boardState[row-2][col] == 9) {
-					if (aimove) {
-						updateaiscore(boardState[row-1][col]);
-					}
-					else {
-						updateplayerscore(boardState[row-1][col]);
-					}
-				}
-			}
-
-			//If horizontal line is placed anywhere else on the board, then it has to check if a box has been made above or below
-			else {
-				if (boardState[row+1][col-1] == 11 && boardState[row+1][col+1] == 11 && boardState[row+2][col] == 9) {
-					if (aimove) {
-						updateaiscore(boardState[row+1][col]);
-					}
-					else {
-						updateplayerscore(boardState[row+1][col]);
-					}
-				}
-				if (boardState[row-1][col-1] == 11 && boardState[row-1][col+1] == 11 && boardState[row-2][col] == 9) {
-					if (aimove) {
-						updateaiscore(boardState[row-1][col]);
-					}
-					else {
-						updateplayerscore(boardState[row-1][col]);
-					}
-				}
-			}
-
-		}
-
-		//If vertical line is placed anywhere at the very left of the board, then it just has to check if a box has been to the right
-		else if (direction.equals("vertical")) {
-
-			if (col == 0) {
-				if (boardState[row-1][col+1] == 9 && boardState[row+1][col+1] == 9 && boardState[row][col+2] == 11) {
-					if (aimove) {
-						updateaiscore(boardState[row][col+1]);
-					}
-					else {
-						updateplayerscore(boardState[row][col+1]);
-					}
-				}
-			}
-
-			//If vertical line is placed anywhere at the very right of the board, then it just has to check if a box has been to the left
-			else if (col == BOARD_SIZE - 1) {
-				if (boardState[row-1][col-1] == 9 && boardState[row+1][col-1] == 9 && boardState[row][col-2] == 11) {
-					if (aimove) {
-						updateaiscore(boardState[row][col-1]);
-					}
-					else {
-						updateplayerscore(boardState[row][col-1]);
-					}
-				}
-			}
-
-			//If vertical line is placed anywhere else on the board, then it has to check if a box has been to the right or left
-			else {
-				if (boardState[row-1][col+1] == 9 && boardState[row+1][col+1] == 9 && boardState[row][col+2] == 11) {
-					if (aimove) {
-						updateaiscore(boardState[row][col+1]);
-					}
-					else {
-						updateplayerscore(boardState[row][col+1]);
-					}
-				}
-
-				if (boardState[row-1][col-1] == 9 && boardState[row+1][col-1] == 9 && boardState[row][col-2] == 11) {
-					if (aimove) {
-						updateaiscore(boardState[row][col-1]);
-					}
-					else {
-						updateplayerscore(boardState[row][col-1]);
-					}
-				}
-			}
-
-		}
+        
 	}
-
 }
