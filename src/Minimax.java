@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
 
-//This class handles the AI movements
 public class Minimax {
 	Board b;
 
