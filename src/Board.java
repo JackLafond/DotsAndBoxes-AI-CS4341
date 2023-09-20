@@ -173,13 +173,20 @@ public class Board {
         this.lastLine = lastLine;
     }
 
-    public ArrayList<Line> getLegalMoves(){
-        ArrayList<Line> legalLines = new ArrayList<>();
+    //Three int array: direction, x, y
+    public ArrayList<int[]> getLegalMoves(){
+        ArrayList<int[]> legalLines = new ArrayList<>();
         for(int i = 0; i <= 9; i++) {
             for(int j = 0; j <= 10; j++) {
-                if(!this.hs[j][i].isComplete()) legalLines.add(this.hs[j][i]);
+                if(!this.hs[j][i].isComplete()){
+                    int[] myVals = new int[]{0,j,i};
+                    legalLines.add(myVals);
+                }
 
-                if(!this.vs[i][j].isComplete()) legalLines.add(this.vs[i][j]);
+                if(!this.vs[i][j].isComplete()){
+                    int[] myVals = new int[]{1,i,j};
+                    legalLines.add(myVals);
+                }
             }
         }
         return legalLines;
