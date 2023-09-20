@@ -11,17 +11,11 @@ public class Board {
 	int maxlines;
 	int playerscore;
 	int aiscore;
-	int totallines;
-	boolean aimove;
-	int difference;
 
-	Board (int[][] state, int playerscore, int aiscore, boolean aimove, int totallines, int maxlines) {
+	Board (int[][] state, int playerscore, int aiscore, boolean aimove) {
 		this.playerscore = playerscore;
 		this.aiscore = aiscore;
-		this.aimove = aimove;
 		this.boardState = state;
-		this.totallines = totallines;
-		this.maxlines = maxlines;
 	}
 
 	public int[][] getState () {
@@ -36,13 +30,8 @@ public class Board {
 		this.aiscore += score;
 	}
 
-	public boolean isAIMove () {
-		return this.aimove;
-	}
-
-	//Evaluates the current board
-	public void evaluate () {
-		this.difference = this.aiscore - this.playerscore;
+	public int evaluate () {
+		return this.aiscore - this.playerscore;
 	}
 
 	//Prints the board
