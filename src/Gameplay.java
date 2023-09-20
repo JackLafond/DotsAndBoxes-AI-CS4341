@@ -56,17 +56,22 @@ public class Gameplay {
 
                             //Log opponents Move info here, make into a single func (used 2x)
                             String oppMove = fileContents(moveFile);
+                            //oppCoords is currently an int array size 2 that holds the relevant
+                            //board array x and y values to be changed
                             int[] oppCoords = coordSanitization(oppMove);
 
+                            //TODO: update saveMove for new data structure
                             saveMove(gameBoard, oppCoords, -1);
 
                             //Calculate Move
                             System.out.println("calculating move");
+
                             int[] moveVals = Minimax.getBestMove(gameBoard);
                             String ourMove = "dannydevito " + moveVals[0] + "," + moveVals[1] + " " + moveVals[2] + "," + moveVals[3];
                             saveMove(gameBoard, moveVals, 1);
                             //Write to moveFile to end turn
                             overwriteFile(moveFile, ourMove);
+
                             System.out.println("sending move");
 
                         }
@@ -157,8 +162,13 @@ public class Gameplay {
     }
 
 
+    /**
+     * Gives the coordinates of our game array to update the line of
+     * @param move the string given by the move_file
+     * @return an int array of size 2 with the x and y value of the board array to update
+     */
     public static int[] coordSanitization(String move){
-        int[] coordVals = new int[5];
+        int[] arrayCoordsToUpdate = new int[2];
 
         String coords = move.substring(move.length() - 7);
         String coord1 = coords.substring(0,3);
@@ -172,24 +182,24 @@ public class Gameplay {
         int x2 = Integer.parseInt(parts2[0]);
         int y2 = Integer.parseInt(parts2[1]);
 
+        //Ensure we have bottom left coord
         if(x2-x1 < 0 || y2-y1 < 0){
-            coordVals[0] = x2;
-            coordVals[1] = y2;
-            coordVals[2] = x1;
-            coordVals[3] = y1;
+            arrayCoordsToUpdate[0] = x2;
+            arrayCoordsToUpdate[1] = y2;
+
         } else{
-            coordVals[0] = x1;
-            coordVals[1] = y1;
-            coordVals[2] = x2;
-            coordVals[3] = y2;
+            arrayCoordsToUpdate[0] = x1;
+            arrayCoordsToUpdate[1] = y1;
         }
         if(x2-x1 != 0){
-            coordVals[4] = 0;
+            //Horizontal Line, add to x val
+            arrayCoordsToUpdate[0]++;
         } else {
-            coordVals[4] = 1;
+            //Vert Line, add to Y
+            arrayCoordsToUpdate[1]++;
         }
 
-        return coordVals;
+        return arrayCoordsToUpdate;
     }
 
 
