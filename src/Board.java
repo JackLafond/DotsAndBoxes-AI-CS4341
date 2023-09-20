@@ -23,7 +23,11 @@ public class Board {
         this.vs = deepCopyLines(board.vs);
         this.hs = deepCopyLines(board.hs);
         this.boxes = deepCopyBoxes(board.boxes);
-        this.lastLine = Arrays.copyOf(board.lastLine, board.lastLine.length);
+        if(board.lastLine != null){
+            this.lastLine = Arrays.copyOf(board.lastLine, board.lastLine.length);
+        } else {
+            this.lastLine = null;
+        }
     }
 
     public Board copy() {

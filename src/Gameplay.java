@@ -55,12 +55,12 @@ public class Gameplay {
                             //Log opponents Move info here, make into a single func (used 2x)
                             String oppMove = fileContents(moveFile);
                             int[] oppCoords = coordSanitization(oppMove);
-                            saveOpponentMove(gameBoard, oppCoords);
+                            saveMove(gameBoard, oppCoords, -1);
 
                             //Calculate Move
                             int[] moveVals = Minimax.getBestMove(gameBoard);
                             String ourMove = "dannydevito " + moveVals[0] + "," + moveVals[1] + " " + moveVals[2] + "," + moveVals[3];
-
+                            saveMove(gameBoard, moveVals, 1);
                             //Write to moveFile to end turn
                             overwriteFile(moveFile, ourMove);
 
@@ -75,7 +75,7 @@ public class Gameplay {
 
                             String oppMove = fileContents(moveFile);
                             int[] oppCoords = coordSanitization(oppMove);
-                            saveOpponentMove(gameBoard, oppCoords);
+                            saveMove(gameBoard, oppCoords, -1);
 
                             //Write Empty move to moveFile
                             String passMove = "dannydevito 0,0 0,0";
@@ -187,8 +187,8 @@ public class Gameplay {
     }
 
 
-    public static void saveOpponentMove(Board board, int[] sanitizedCoords){
-        board.updateLine(sanitizedCoords[0], sanitizedCoords[1], sanitizedCoords[4], -1);
+    public static void saveMove(Board board, int[] sanitizedCoords, int player){
+        board.updateLine(sanitizedCoords[0], sanitizedCoords[1], sanitizedCoords[4], player);
     }
 
 }
