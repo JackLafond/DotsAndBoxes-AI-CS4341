@@ -1,3 +1,5 @@
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -94,8 +96,8 @@ public class Minimax {
             }
         }
         return moves;
-
     }
+
 
     public static LinkedList<Board> getChildren(Board b) {
         LinkedList<Board> children = new LinkedList<Board>();
@@ -113,7 +115,10 @@ public class Minimax {
                 }
             }
         }
-        return children;
+        // Sort the children list based on the evaluation scores in descending order.
+        Collections.sort(children, Comparator.comparingDouble(child -> -evaluateBoard(child)));
 
+        // Return the top 5 children or all if there are fewer than 5.
+        return new LinkedList<>(children.subList(0, Math.min(5, children.size())));
     }
 }
