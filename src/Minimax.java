@@ -8,7 +8,7 @@ public class Minimax {
 
     public static int[] getBestMove(Board b) {
 
-        Board searchBoard = b.copy();
+        Board searchBoard = b.copyBoard();
         int[] bestMove = search(searchBoard, 0, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
         int[] coords = new int[5];
         coords[0] = bestMove[2];
@@ -34,7 +34,7 @@ public class Minimax {
 
         int[] curLine = b.lastLine;
         if(curLine == null){
-            curLine = new int[]{0,0,0};
+            curLine = new int[]{0,4,4};
         }
 
         LinkedList<Board> children = getChildren(b);

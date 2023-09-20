@@ -49,7 +49,7 @@ public class Gameplay {
                             //TODO: Make a move here
 
                             //-----------------------------------------
-                            System.out.println("GO File Detected!\n");
+                            System.out.println("GO File Detected!");
                             //-----------------------------------------
 
                             //Log opponents Move info here, make into a single func (used 2x)
@@ -58,11 +58,13 @@ public class Gameplay {
                             saveMove(gameBoard, oppCoords, -1);
 
                             //Calculate Move
+                            System.out.println("calculating move");
                             int[] moveVals = Minimax.getBestMove(gameBoard);
                             String ourMove = "dannydevito " + moveVals[0] + "," + moveVals[1] + " " + moveVals[2] + "," + moveVals[3];
                             saveMove(gameBoard, moveVals, 1);
                             //Write to moveFile to end turn
                             overwriteFile(moveFile, ourMove);
+                            System.out.println("sending move");
 
                         }
                         else if (fileName.equals(passFile)){
