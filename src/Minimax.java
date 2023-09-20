@@ -3,88 +3,59 @@ import java.util.List;
 
 //This class handles the AI movements
 public class Minimax {
-
 	Board b;
 
-	Minimax (Board b, int depth) {
+	Minimax (Board b) {
 		this.b = b;
-		this.b.aimove = true;
 	}
 
-	//Move is called from main to initiate AI Move
 	public Board move () {
-		//Grabs current board
 		Node current = new Node(b);
-		//Initiates minimax search with current board and specified depth
 		Node minimax = search(current, 0);
-		//Traverses back up the tree to find the move to make
 		Node move = getMove(minimax);
-		//Returns the board after move has been made
 		return move.board;
 	}
 
-	//Recursive Minimax Search, returns Node at max depth
 	public Node search (Node current, int depth) {
-
-		//Checks if we are at the max depth/ply, or if board is complete
-		if (depth > depth || current.board.totallines == current.board.maxlines) {
+		if (depth > depth){
 			return current;
 		}
 
 		boolean ai = false;
-
-		//At every other depth moves alternate between Player and AI
 		if (depth % 2 == 0) {
 			ai = false;
 		}
 
-		//Gets successors of current node (possible moves)
 		List<Node> children = getSuccessors(current, ai);
-
 		Node tempNode = null;
 
 		if (current.board.isAIMove()) {
 			Integer value = Integer.MIN_VALUE;
 
 			for (Node child : children) {
-
-				//Runs evaluation function
-				child.board.evaluate();
-
-				//Recurses down tree until max depth is reached for a child, then does comparisons
 				Node x = search(child, depth + 1);
-				if (x.board.difference > value) {
+				if (x.board.evaluate() > value) {
 					tempNode = x;
-					value = x.board.difference;
+					value = x.board.evaluate();
 				}
 			}
 			return tempNode;
 		}
-
-		//If its Player's depth/move, find the min node based on the difference in scores
 		else {
-
 			Integer value = Integer.MAX_VALUE;
 			for (Node child : children) {
-                
-				//Runs evaluation function
-				child.board.evaluate();
-
-				//Recurses down tree until max depth is reached for a child, then does comparisons
 				Node x = search(child, depth + 1);
-				if (x.board.difference < value) {
+				if (x.board.evaluate() < value) {
 					tempNode = x;
-					value = x.board.difference;
+					value = x.board.evaluate();
 				}
 			}
 			return tempNode;
 		}
-
 	}
 
 	public Node getMove (Node current) {
 		Node tempNode = current;
-
 		while (tempNode.parent.parent != null) {
 			tempNode = tempNode.parent;
 		}
