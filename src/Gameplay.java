@@ -13,12 +13,6 @@ public class Gameplay {
     public static final Path directoryPath = Path.of("C:\\Users\\Aidan\\Desktop\\Intro to AI\\dots_boxes_referee\\dots_boxes_referee");
 
     //Main function that is while loop that handles all gameplay
-
-    //What to do on groupname.go
-
-    //What to do on groupname.pass
-
-    //What to do when game over
     public static void main(String[] args) throws IOException, InterruptedException {
         boolean gameRunning = true;
         Path dir = Paths.get(System.getProperty("user.dir")); //Can manually change Directory as necessary
@@ -61,14 +55,22 @@ public class Gameplay {
                             int[] oppCoords = coordSanitization(oppMove);
 
                             //TODO: update saveMove for new data structure
-                            saveMove(gameBoard, oppCoords, -1);
+//                            saveMove(gameBoard, oppCoords, -1);
+                            //TODO: make update state func in Board
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], player);
 
-                            //Calculate Move
+                            //TODO: Calculate Move
                             System.out.println("calculating move");
-
                             int[] moveVals = Minimax.getBestMove(gameBoard);
+
                             String ourMove = "dannydevito " + moveVals[0] + "," + moveVals[1] + " " + moveVals[2] + "," + moveVals[3];
-                            saveMove(gameBoard, moveVals, 1);
+                            int[] ourCoords = coordSanitization(ourMove);
+
+                            //TODO: make update state func in Board
+                            gameBoard.updateState(ourCoords[0], ourCoords[1], player);
+//                            saveMove(gameBoard, moveVals, 1);
+
+
                             //Write to moveFile to end turn
                             overwriteFile(moveFile, ourMove);
 
@@ -85,7 +87,8 @@ public class Gameplay {
 
                             String oppMove = fileContents(moveFile);
                             int[] oppCoords = coordSanitization(oppMove);
-                            saveMove(gameBoard, oppCoords, -1);
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], player);
+//                            saveMove(gameBoard, oppCoords, -1);
 
                             //Write Empty move to moveFile
                             String passMove = "dannydevito 0,0 0,0";
@@ -95,7 +98,7 @@ public class Gameplay {
                     }
                 }
             }
-            gameBoard.printBoard();
+            gameBoard.printboard();
             // Reset the key
             boolean valid = key.reset();
             if (!valid) {
@@ -203,8 +206,5 @@ public class Gameplay {
     }
 
 
-    public static void saveMove(Board board, int[] sanitizedCoords, int player){
-        board.updateLine(sanitizedCoords[0], sanitizedCoords[1], sanitizedCoords[4], player);
-    }
 
 }
