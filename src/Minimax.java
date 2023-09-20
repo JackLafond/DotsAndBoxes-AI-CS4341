@@ -1,4 +1,6 @@
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public class Minimax {
     
@@ -6,40 +8,52 @@ public class Minimax {
 
     public int[] getBestMove(Board b) {
 
-        
+        int[] bestMove = search(b, 0, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        int[] coords = new int[4];
+        coords[0] = bestMove[2];
+        coords[1] = bestMove[3];
+        if(bestMove[1] == 0) {
+            coords[2] = coords[0] + 1;
+            coords[3] = coords[1];
+        } else {
+            coords[2] = coords[0];
+            coords[3] = coords[1] + 1;
+        }
 
-        return new int[]{0,0,0,0};
+        return coords;
     }
 
-    public int search(Board b, int depth, boolean isMaxing, int alpha, int beta) {
+    public int[] search(Board b, int depth, boolean isMaxing, int alpha, int beta) {
+
+        int[] curLine = b.lastLine;
 
         LinkedList<Board> children = getChildren(b);
         if(children.isEmpty()) {
-            return evaluateBoard(b);
+            return new int[]{evaluateBoard(b), curLine[0], curLine[1], curLine[2]};
         }
 
         if(isMaxing) {
-            int curBest = -999999;
+            int[] bestMove = new int[]{-999999, curLine[0], curLine[1], curLine[2]};
             for(Board child : children) {
-                int val = search(child, depth + 1, false, alpha, beta);
-                curBest = Math.max(curBest, val);
-                alpha = Math.max(curBest, alpha);
+                int[] aMove = search(child, depth + 1, false, alpha, beta);
+                bestMove[0] = Math.max(aMove[0], bestMove[0]);
+                alpha = Math.max(bestMove[0], alpha);
                 if(alpha >= beta) {
                     break;
                 }
             }
-            return curBest;
+            return bestMove;
         } else {
-            int curBest = 999999;
+            int[] bestMove = new int[]{999999, curLine[0], curLine[1], curLine[2]};
             for(Board child : children) {
-                int val = search(child, depth + 1, true, alpha, beta);
-                curBest = Math.min(curBest, val);
-                beta = Math.min(curBest, beta);
+                int[] aMove = search(child, depth + 1, true, alpha, beta);
+                bestMove[0] = Math.min(aMove[0], bestMove[0]);
+                beta = Math.min(bestMove[0], beta);
                 if(beta <= alpha) {
                     break;
                 }
             }
-            return curBest;
+            return bestMove;
         }
     }
 
@@ -78,12 +92,14 @@ public class Minimax {
         for(int i = 0; i <= 9; i++) {
             for(int j = 0; j <= 10; j++) {
                 if(!b.hs[j][i].isComplete()) {
-                    children.add(b);
+                    children.add(b.copy());
                     children.getLast().hs[j][i].setComplete(true);
+                    children.getLast().setLastLine(new int[]{0, j, i});
                 }
                 if(!b.vs[i][j].isComplete()) {
-                    children.add(b);
+                    children.add(b.copy());
                     children.getLast().vs[i][j].setComplete(true);
+                    children.getLast().setLastLine(new int[]{1, i, j});
                 }
             }
         }
