@@ -1,124 +1,139 @@
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
+//This class handles the AI movements
 public class Minimax {
-    
-    public Minimax() {};
 
-    public static int[] getBestMove(Board b) {
+	Board b;
 
-        Board searchBoard = b.copyBoard();
-        int[] bestMove = search(searchBoard, 0, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        int[] coords = new int[5];
-        coords[0] = bestMove[2];
-        coords[1] = bestMove[3];
-        if(bestMove[1] == 0) {
-            coords[2] = coords[0] + 1;
-            coords[3] = coords[1];
-        } else {
-            coords[2] = coords[0];
-            coords[3] = coords[1] + 1;
-        }
+	Minimax (Board b, int depth) {
+		this.b = b;
+		this.b.aimove = true;
+	}
 
-        if(coords[0] - coords[2] != 0){
-            coords[4] = 0;
-        } else{
-            coords[4] = 1;
-        }
+	//Move is called from main to initiate AI Move
+	public Board move () {
+		//Grabs current board
+		Node current = new Node(b);
+		//Initiates minimax search with current board and specified depth
+		Node minimax = search(current, 0);
+		//Traverses back up the tree to find the move to make
+		Node move = getMove(minimax);
+		//Returns the board after move has been made
+		return move.board;
+	}
 
-        return coords;
-    }
+	//Recursive Minimax Search, returns Node at max depth
+	public Node search (Node current, int depth) {
 
-    public static int[] search(Board b, int depth, boolean isMaxing, int alpha, int beta) {
+		//Checks if we are at the max depth/ply, or if board is complete
+		if (depth > depth || current.board.totallines == current.board.maxlines) {
+			return current;
+		}
 
-        int[] curLine = b.lastLine;
-        if(curLine == null){
-            curLine = b.getLegalMoves().get(0);
-        }
+		boolean ai = false;
 
-        LinkedList<Board> children = getChildren(b);
-        if(children.isEmpty() || depth == 5) {
-            return new int[]{evaluateBoard(b), curLine[0], curLine[1], curLine[2]};
-        }
+		//At every other depth moves alternate between Player and AI
+		if (depth % 2 == 0) {
+			ai = false;
+		}
 
-        if(isMaxing) {
-            int[] bestMove = new int[]{-999999, curLine[0], curLine[1], curLine[2]};
-            for(Board child : children) {
-                int[] aMove = search(child, depth + 1, false, alpha, beta);
-                bestMove[0] = Math.max(aMove[0], bestMove[0]);
-                alpha = Math.max(bestMove[0], alpha);
-                if(alpha >= beta) {
-                    break;
-                }
-            }
-            return bestMove;
-        } else {
-            int[] bestMove = new int[]{999999, curLine[0], curLine[1], curLine[2]};
-            for(Board child : children) {
-                int[] aMove = search(child, depth + 1, true, alpha, beta);
-                bestMove[0] = Math.min(aMove[0], bestMove[0]);
-                beta = Math.min(bestMove[0], beta);
-                if(beta <= alpha) {
-                    break;
-                }
-            }
-            return bestMove;
-        }
-    }
+		//Gets successors of current node (possible moves)
+		List<Node> children = getSuccessors(current, ai);
 
-    public static int evaluateBoard(Board b) {
+		Node tempNode = null;
 
-        int sum = 0;
-        for(int i = 0; i < 9; i++) {
-            for(Box aBox: b.boxes[i]) {
-                sum = sum + aBox.completedBy;
-                if(aBox.isOneLineAway()) {
-                    sum = sum - 1;
-                }
-            }
-        }
-        return sum;
-    }
+		if (current.board.isAIMove()) {
+			Integer value = Integer.MIN_VALUE;
 
-    public LinkedList<Line> getMoves(Board b) {
-        LinkedList<Line> moves = new LinkedList<Line>();
-        for(int i = 0; i <= 9; i++) {
-            for(int j = 0; j <= 10; j++) {
-                if(!b.hs[j][i].isComplete()) {
-                    moves.add(b.hs[j][i]);
-                }
-                if(!b.vs[i][j].isComplete()) {
-                    moves.add(b.vs[i][j]);
-                }
-            }
-        }
-        return moves;
-    }
+			for (Node child : children) {
 
+				//Runs evaluation function
+				child.board.evaluate();
 
-    public static LinkedList<Board> getChildren(Board b) {
-        LinkedList<Board> children = new LinkedList<Board>();
-        for(int i = 0; i < 9; i++) {
-            for(int j = 0; j < 10; j++) {
-                if(!b.vs[j][i].isComplete()) {
-                    children.add(b.copy());
-                    children.getLast().vs[j][i].setComplete(true);
-                    children.getLast().setLastLine(new int[]{0, j, i});
-                }
-                if(!b.hs[i][j].isComplete()) {
-                    children.add(b.copy());
-                    children.getLast().hs[i][j].setComplete(true);
-                    children.getLast().setLastLine(new int[]{1, i, j});
-                }
-            }
-        }
-        // Sort the children list based on the evaluation scores in descending order.
-        Collections.sort(children, Comparator.comparingDouble(child -> -evaluateBoard(child)));
+				//Recurses down tree until max depth is reached for a child, then does comparisons
+				Node x = search(child, depth + 1);
+				if (x.board.difference > value) {
+					tempNode = x;
+					value = x.board.difference;
+				}
+			}
+			return tempNode;
+		}
 
-        // Return the top 5 children or all if there are fewer than 5.
-        return new LinkedList<>(children.subList(0, Math.min(5, children.size())));
-    }
+		//If its Player's depth/move, find the min node based on the difference in scores
+		else {
+
+			Integer value = Integer.MAX_VALUE;
+			for (Node child : children) {
+                
+				//Runs evaluation function
+				child.board.evaluate();
+
+				//Recurses down tree until max depth is reached for a child, then does comparisons
+				Node x = search(child, depth + 1);
+				if (x.board.difference < value) {
+					tempNode = x;
+					value = x.board.difference;
+				}
+			}
+			return tempNode;
+		}
+
+	}
+
+	public Node getMove (Node current) {
+		Node tempNode = current;
+
+		while (tempNode.parent.parent != null) {
+			tempNode = tempNode.parent;
+		}
+		return tempNode;
+	}
+
+	public List<Node> getSuccessors(Node state, boolean value) {
+
+		List<Node> children = new ArrayList<>();
+		Board x = state.board;
+		int rows = x.rows;
+		int cols = x.cols;
+
+		int[][] board = x.getState();
+
+		for (int i = 0; i < rows; i ++) {
+			for (int j = 0; j < cols; j++) {
+				if ((i % 2 == 0 && j % 2 != 0) && board[i][j] == 7) {
+					int[][] temp = copyArray(board, rows, cols);
+					temp[i][j] = 9;
+					Board tmp = new Board(temp, x.rows, x.cols, x.playerscore, x.aiscore, value, x.totallines, x.maxlines);
+					tmp.updatescore(i, j, "horizontal");
+					tmp.totallines++;
+					Node child = new Node(tmp);
+					child.setParent(state);
+					children.add(child);
+				}
+				else if ((i % 2 != 0 && j % 2 == 0) && board[i][j] == 7) {
+					int[][] temp = copyArray(board, rows, cols);
+					temp[i][j] = 11;
+					Board tmp = new Board(temp, x.rows, x.cols, x.playerscore, x.aiscore, value, x.totallines, x.maxlines);
+					tmp.updatescore(i, j, "vertical");
+					tmp.totallines++;
+					Node child = new Node(tmp);
+					child.setParent(state);
+					children.add(child);
+				}
+			}
+		}
+		return children;
+	}
+
+	public int[][] copyArray (int[][] state, int rows, int cols) {
+		int[][] temp = new int[rows][cols];
+		for (int i = 0; i < rows; i ++) {
+			for (int j = 0; j < cols; j++) {
+				temp[i][j] = state[i][j];
+			}
+		}
+		return temp;
+	}
 }

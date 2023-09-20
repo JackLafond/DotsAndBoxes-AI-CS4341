@@ -1,195 +1,185 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-
+//Each Board will hold information of the current state
 public class Board {
-    
-    public Line[][] vs;
-    public Line[][] hs;
-    public Box[][] boxes;
-    public int[] lastLine;
 
-    public Board() {
+	int[][] state;
+	int rows;
+	int cols;
+	int maxlines;
+	int playerscore;
+	int aiscore;
+	int totallines;
+	boolean aimove;
+	int difference;
 
-        this.vs = new Line[10][9];
-        this.hs = new Line[9][10];
-        this.boxes = new Box[9][9];
-        this.lastLine = null;
+	//Constructor for Board
+	Board (int[][] state, int rows, int cols, int playerscore, int aiscore, boolean aimove, int totallines, int maxlines) {
+		this.rows = rows;
+		this.cols = cols;
+		this.playerscore = playerscore;
+		this.aiscore = aiscore;
+		this.aimove = aimove;
+		this.state = state;
+		this.totallines = totallines;
+		this.maxlines = maxlines;
+	}
 
-        initLines();
-        initBoxes();
+	//Returns the state, as a 2D array
+	public int[][] getState () {
+		return this.state;
+	}
 
-    }
+	//Updates Player Score
+	public void updateplayerscore (int score) {
+		this.playerscore += score;
+	}
 
-    public Board(Board board) {
-        this.vs = deepCopyLines(board.vs);
-        this.hs = deepCopyLines(board.hs);
-        this.boxes = deepCopyBoxes(board.boxes);
-        if(board.lastLine != null){
-            this.lastLine = Arrays.copyOf(board.lastLine, board.lastLine.length);
-        } else {
-            this.lastLine = null;
-        }
-    }
+	//Updates AI Score
+	public void updateaiscore (int score) {
+		this.aiscore += score;
+	}
 
-    public Board copy() {
-        return new Board(this);
-    }
+	//Checks if current move is a move for AI
+	public boolean isAIMove () {
+		return this.aimove;
+	}
 
-    public Board copyBoard(){
-        Board newBoard = new Board();
+	//Evaluates the current board
+	public void evaluate () {
+		this.difference = this.aiscore - this.playerscore;
+	}
 
-        System.out.println("copying lines");
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 10; j++) {
-                boolean vertVal = this.vs[j][i].isComplete();
-                newBoard.vs[j][i].setComplete(vertVal);
+	/* These numbers will be used to represent things in the array
+	 * 0 = dot
+	 * 7 = blank space
+	 * 9 = horizontal line
+	 * 11 = vertical line
+	 */
 
-                boolean horizVal = this.hs[i][j].isComplete();
-                newBoard.hs[i][j].setComplete(horizVal);
+	//Prints the board
+	public void printboard() {
 
-            }
-        }
-        System.out.println("lines copied");
-        newBoard.initBoxes();
-        newBoard.lastLine = this.lastLine;
+		for (int i = 0; i < rows; i++ ) {
+			for (int j = 0; j < cols; j ++) {
+				if (state[i][j] == 0) {
+					System.out.print("." + " ");
+				}
+				else if (state[i][j] == 7){
+					System.out.print(" " + " ");
+				}
+				else if (state[i][j] == 9) {
+					System.out.print("-" + " ");
+				}
+				else if (state[i][j] == 11) {
+					System.out.print("|" + " ");
+				}
+				else {
+					System.out.print(state[i][j] + " ");
+				}
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
 
-        return newBoard;
-    }
+	//Runs through the board after a move has been and checks if score needs to be updated
+	public void updatescore (int row, int col, String direction) {
 
-    private Line[][] deepCopyLines(Line[][] original) {
-        if (original == null) {
-            return null;
-        }
-        
-        int numRows = original.length;
-        Line[][] copy = new Line[numRows][];
-        
-        for (int i = 0; i < numRows; i++) {
-            if (original[i] != null) {
-                copy[i] = Arrays.copyOf(original[i], original[i].length);
-            }
-        }
-        
-        return copy;
-    }
+		if (direction.equals("horizontal")) {
 
-    private Box[][] deepCopyBoxes(Box[][] original) {
-        if (original == null) {
-            return null;
-        }
-        
-        int numRows = original.length;
-        Box[][] copy = new Box[numRows][];
-        
-        for (int i = 0; i < numRows; i++) {
-            if (original[i] != null) {
-                copy[i] = Arrays.copyOf(original[i], original[i].length);
-            }
-        }
-        
-        return copy;
-    }
+			//If horizontal line is placed anywhere at the top of the board, then it just has to check if a box has been made below
+			if (row == 0) {
+				if (state[row+1][col-1] == 11 && state[row+1][col+1] == 11 && state[row+2][col] == 9) {
+					if (aimove) {
+						updateaiscore(state[row+1][col]);
+					}
+					else {
+						updateplayerscore(state[row+1][col]);
+					}
+				}
+			}
 
-    public void initBoxes() {
+			//If horizontal line is placed anywhere at the bottom of the board, then it just has to check if a box has been made above
+			else if (row == rows - 1) {
+				if (state[row-1][col-1] == 11 && state[row-1][col+1] == 11 && state[row-2][col] == 9) {
+					if (aimove) {
+						updateaiscore(state[row-1][col]);
+					}
+					else {
+						updateplayerscore(state[row-1][col]);
+					}
+				}
+			}
 
-        for(int i = 0; i <= 8; i++) {
-            for(int j = 0; j <= 8; j++) {
-                this.boxes[j][i] = new Box(this.hs[j][i + 1], this.vs[j + 1][i], this.hs[j][i], this.vs[j][i]);
-            }
-        }
-    }
+			//If horizontal line is placed anywhere else on the board, then it has to check if a box has been made above or below
+			else {
+				if (state[row+1][col-1] == 11 && state[row+1][col+1] == 11 && state[row+2][col] == 9) {
+					if (aimove) {
+						updateaiscore(state[row+1][col]);
+					}
+					else {
+						updateplayerscore(state[row+1][col]);
+					}
+				}
+				if (state[row-1][col-1] == 11 && state[row-1][col+1] == 11 && state[row-2][col] == 9) {
+					if (aimove) {
+						updateaiscore(state[row-1][col]);
+					}
+					else {
+						updateplayerscore(state[row-1][col]);
+					}
+				}
+			}
 
-    public void initLines() {
+		}
 
-        for(int i = 0; i < 9; i++) {
-            for(int j = 0; j < 10; j++) {
-                this.vs[j][i] = new Line();
-                this.hs[i][j] = new Line();
-            }
-        }
-    }
+		//If vertical line is placed anywhere at the very left of the board, then it just has to check if a box has been to the right
+		else if (direction.equals("vertical")) {
 
-    public void printBoard(){
-        for(int i = 0; i < 9; i++){
-            for(int j = 0; j < 9; j++){
-                System.out.print(".");
-                if(hs[i][j].isComplete()) System.out.print("---");
-                else System.out.print("\t");
-            }
-            System.out.print("\n");
-            if(i < 8){
-                for(int h =0; h < 3; h++){
-                    for(int horisontal=0; horisontal <9; horisontal++){
-                        if(vs[i][horisontal].isComplete()) System.out.print("|\t");
-                        else System.out.print(" \t");
-                    }
-                    System.out.print("\n");
-                }
-            }
-        }
-    }
+			if (col == 0) {
+				if (state[row-1][col+1] == 9 && state[row+1][col+1] == 9 && state[row][col+2] == 11) {
+					if (aimove) {
+						updateaiscore(state[row][col+1]);
+					}
+					else {
+						updateplayerscore(state[row][col+1]);
+					}
+				}
+			}
 
-    public void updateLine(int x, int y, int direction, int player){
-        if(direction == 0){
-            //update Horiz
-            Line toUpdate = hs[x][y];
-            toUpdate.setComplete(true);
-            if(y < 9){
-                //Check top box
-                Box horizCheck = boxes[x][y];
-                if(horizCheck.isComplete()){
-                    horizCheck.setCompletedBy(player);
-                }
-            }
-            if(y > 0){
-                //Check bottom box
-                Box vertCheck = boxes[x][y-1];
-                if(vertCheck.isComplete()){
-                    vertCheck.setCompletedBy(player);
-                }
-            }
-        } else if(direction == 1){
-            //update vert
-            Line toUpdate = vs[x][y];
-            toUpdate.setComplete(true);
-            if(x < 8){
-                //Check right box
-                Box vertCheck = boxes[x][y];
-                if(vertCheck.isComplete()){
-                    vertCheck.setCompletedBy(player);
-                }
-            }
-            if(x > 0){
-                //Check left box
-                Box vertCheck = boxes[x-1][y];
-                if(vertCheck.isComplete()){
-                    vertCheck.setCompletedBy(player);
-                }
-            }
-        }
-    }
+			//If vertical line is placed anywhere at the very right of the board, then it just has to check if a box has been to the left
+			else if (col == cols - 1) {
+				if (state[row-1][col-1] == 9 && state[row+1][col-1] == 9 && state[row][col-2] == 11) {
+					if (aimove) {
+						updateaiscore(state[row][col-1]);
+					}
+					else {
+						updateplayerscore(state[row][col-1]);
+					}
+				}
+			}
 
-    public void setLastLine(int[] lastLine) {
-        this.lastLine = lastLine;
-    }
+			//If vertical line is placed anywhere else on the board, then it has to check if a box has been to the right or left
+			else {
+				if (state[row-1][col+1] == 9 && state[row+1][col+1] == 9 && state[row][col+2] == 11) {
+					if (aimove) {
+						updateaiscore(state[row][col+1]);
+					}
+					else {
+						updateplayerscore(state[row][col+1]);
+					}
+				}
 
-    //Three int array: direction, x, y
-    public ArrayList<int[]> getLegalMoves(){
-        ArrayList<int[]> legalLines = new ArrayList<>();
-        for(int i = 0; i < 9; i++) {
-            for(int j = 0; j < 10; j++) {
-                if(!this.hs[i][j].isComplete()){
-                    int[] myVals = new int[]{0,i,j};
-                    legalLines.add(myVals);
-                }
+				if (state[row-1][col-1] == 9 && state[row+1][col-1] == 9 && state[row][col-2] == 11) {
+					if (aimove) {
+						updateaiscore(state[row][col-1]);
+					}
+					else {
+						updateplayerscore(state[row][col-1]);
+					}
+				}
+			}
 
-                if(!this.vs[j][i].isComplete()){
-                    int[] myVals = new int[]{1,j,i};
-                    legalLines.add(myVals);
-                }
-            }
-        }
-        return legalLines;
-    }
+		}
+	}
 
 }
