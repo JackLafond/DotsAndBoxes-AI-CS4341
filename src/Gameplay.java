@@ -12,7 +12,6 @@ public class Gameplay {
 
     public static final Path directoryPath = Path.of("C:\\Users\\Aidan\\Desktop\\Intro to AI\\dots_boxes_referee\\dots_boxes_referee");
 
-    //Main function that is while loop that handles all gameplay
     public static void main(String[] args) throws IOException, InterruptedException {
         boolean gameRunning = true;
         Path dir = Paths.get(System.getProperty("user.dir")); //Can manually change Directory as necessary
@@ -25,7 +24,25 @@ public class Gameplay {
 
         dir.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
 
-        Board gameBoard = new Board();
+
+        //Initializing the array
+        int arraySize=(9 * 2) + 1;
+        int[][] array = new int[arraySize][arraySize];
+
+        for (int i = 0; i < arraySize; i++) {
+            for (int j = 0; j < arraySize; j++) {
+                if (i % 2 == 0 && j % 2 ==0) {
+                    array[i][j] = 8;
+                }
+                else if(i % 2 == 0 && j % 2 != 0 || i % 2 != 0 && j % 2 == 0 ){
+                    array[i][j] = 2;
+                }
+                else array[i][j] = 0;
+            }
+        }
+
+        //SHOULD IA Move be false here??
+        Board gameBoard = new Board(array, 0, 0, false);
 
         while(gameRunning){
             WatchKey key = watchService.take();

@@ -18,5 +18,4 @@ public class Node {
 	public void addChild(Node current) {
     	this.children.add(current);
     }
-
 }

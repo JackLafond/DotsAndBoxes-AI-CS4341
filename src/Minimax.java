@@ -1,101 +1,92 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedList;
 
+//This class handles the AI movements
 public class Minimax {
-	Board b;
 
-	Minimax (Board b) {
-		this.b = b;
+	Minimax () {}
+
+	//Move is called from main to initiate AI Move
+	public int[] getBestMove(Board b) {
+		
+		return search(b, 0, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
 	}
 
-	public Board move () {
-		Node current = new Node(b);
-		Node minimax = search(current, 0);
-		Node move = getMove(minimax);
-		return move.board;
-	}
+	// returns an int of size 3 where int[2] is the minimax eval, 
+	// int[0] is the row of the line, and int[1] is the column of the line (in our 19x19 array)
+	public int[] search(Board b, int depth, boolean isMaxing, int alpha, int beta) {
 
-	public Node search (Node current, int depth) {
-		if (depth > depth){
-			return current;
+		int[] curLine = b.lastLine;
+		if(curLine == null) {
+			curLine = b.getLegalMoves().get(0);
 		}
 
-		boolean ai = false;
-		if (depth % 2 == 0) {
-			ai = false;
+		List<Board> children = getChildren(b);
+
+		if(children.isEmpty() || depth == 5) {
+			return new int[]{curLine[0], curLine[1], b.evaluate()};
 		}
 
-		List<Node> children = getSuccessors(current, ai);
-		Node tempNode = null;
+		if(isMaxing) {
 
-		if (current.board.isAIMove()) {
-			Integer value = Integer.MIN_VALUE;
-
-			for (Node child : children) {
-				Node x = search(child, depth + 1);
-				if (x.board.evaluate() > value) {
-					tempNode = x;
-					value = x.board.evaluate();
+			int[] bestMove = new int[] {curLine[0], curLine[1], Integer.MIN_VALUE};
+			for(Board child : children) {
+				int[] aMove = search(child, depth + 1, child.myMove, alpha, beta);
+				bestMove[2] = Math.max(bestMove[2], aMove[2]);
+				alpha = Math.max(bestMove[2], alpha);
+				if(alpha >= beta) {
+					break;
 				}
 			}
-			return tempNode;
-		}
-		else {
-			Integer value = Integer.MAX_VALUE;
-			for (Node child : children) {
-				Node x = search(child, depth + 1);
-				if (x.board.evaluate() < value) {
-					tempNode = x;
-					value = x.board.evaluate();
+			return bestMove;
+
+		} else {
+
+			int[] bestMove = new int[] {curLine[0], curLine[1], Integer.MAX_VALUE};
+			for(Board child : children) {
+				int[] aMove = search(child, depth + 1, child.myMove, alpha, beta);
+				bestMove[2] = Math.min(bestMove[2], aMove[2]);
+				beta = Math.min(bestMove[2], beta);
+				if(alpha >= beta) {
+					break;
 				}
 			}
-			return tempNode;
+			return bestMove;
 		}
 	}
 
 	public Node getMove (Node current) {
 		Node tempNode = current;
+
 		while (tempNode.parent.parent != null) {
 			tempNode = tempNode.parent;
 		}
 		return tempNode;
 	}
 
-	public List<Node> getSuccessors(Node state, boolean value) {
+    public List<Board> getChildren(Board b) {
+        LinkedList<Board> children = new LinkedList<Board>();
+        int[][] curState = b.getState();
+        for(int row = 0; row < 19; row++) {
+            for(int col = 0; col < 19; col = col + 2) {
+                if(row % 2 == 0) {
+                    col = col + 1;
+                }
+                if(curState[row][col] == Board.EMPTY_LINE) {
+                    int[][] newState = copyArray(curState, curState.length, curState.length);
+                    Board newB = new Board(newState, b.playerscore, b.aiscore, !b.myMove);
+					if(newB.completeLine(row, col)) {
+						newB.myMove = !newB.myMove;
+					}
+                    children.add(newB);
+                }
+            }
+        }
+        return children;
 
-		List<Node> children = new ArrayList<>();
-		Board x = state.board;
-		int rows = x.rows;
-		int cols = x.cols;
-
-		int[][] board = x.getState();
-
-		for (int i = 0; i < rows; i ++) {
-			for (int j = 0; j < cols; j++) {
-				if ((i % 2 == 0 && j % 2 != 0) && board[i][j] == 7) {
-					int[][] temp = copyArray(board, rows, cols);
-					temp[i][j] = 9;
-					Board tmp = new Board(temp, x.rows, x.cols, x.playerscore, x.aiscore, value, x.totallines, x.maxlines);
-					tmp.updatescore(i, j, "horizontal");
-					tmp.totallines++;
-					Node child = new Node(tmp);
-					child.setParent(state);
-					children.add(child);
-				}
-				else if ((i % 2 != 0 && j % 2 == 0) && board[i][j] == 7) {
-					int[][] temp = copyArray(board, rows, cols);
-					temp[i][j] = 11;
-					Board tmp = new Board(temp, x.rows, x.cols, x.playerscore, x.aiscore, value, x.totallines, x.maxlines);
-					tmp.updatescore(i, j, "vertical");
-					tmp.totallines++;
-					Node child = new Node(tmp);
-					child.setParent(state);
-					children.add(child);
-				}
-			}
-		}
-		return children;
-	}
+    }
 
 	public int[][] copyArray (int[][] state, int rows, int cols) {
 		int[][] temp = new int[rows][cols];
