@@ -12,13 +12,6 @@ public class Gameplay {
 
     public static final Path directoryPath = Path.of("C:\\Users\\Aidan\\Desktop\\Intro to AI\\dots_boxes_referee\\dots_boxes_referee");
 
-    //Main function that is while loop that handles all gameplay
-
-    //What to do on groupname.go
-
-    //What to do on groupname.pass
-
-    //What to do when game over
     public static void main(String[] args) throws IOException, InterruptedException {
         boolean gameRunning = true;
         Path dir = Paths.get(System.getProperty("user.dir")); //Can manually change Directory as necessary
@@ -31,7 +24,25 @@ public class Gameplay {
 
         dir.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
 
-        Board gameBoard = new Board();
+
+        //Initializing the array
+        int arraySize=(9 * 2) + 1;
+        int[][] array = new int[arraySize][arraySize];
+
+        for (int i = 0; i < arraySize; i++) {
+            for (int j = 0; j < arraySize; j++) {
+                if (i % 2 == 0 && j % 2 ==0) {
+                    array[i][j] = 8;
+                }
+                else if(i % 2 == 0 && j % 2 != 0 || i % 2 != 0 && j % 2 == 0 ){
+                    array[i][j] = 2;
+                }
+                else array[i][j] = 0;
+            }
+        }
+
+        //SHOULD IA Move be false here??
+        Board gameBoard = new Board(array, 0, 0, false);
 
         while(gameRunning){
             WatchKey key = watchService.take();
@@ -56,17 +67,30 @@ public class Gameplay {
 
                             //Log opponents Move info here, make into a single func (used 2x)
                             String oppMove = fileContents(moveFile);
-                            int[] oppCoords = coordSanitization(oppMove);
+                            //oppCoords is currently an int array size 2 that holds the relevant
+                            //board array x and y values to be changed
+                            int[] oppCoords = getStateCoordinates(oppMove);
 
-                            saveMove(gameBoard, oppCoords, -1);
+                            //TODO: update saveMove for new data structure
+//                            saveMove(gameBoard, oppCoords, -1);
+                            //TODO: make update state func in Board
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
 
-                            //Calculate Move
+                            //TODO: Calculate Move
                             System.out.println("calculating move");
                             int[] moveVals = Minimax.getBestMove(gameBoard);
+
                             String ourMove = "dannydevito " + moveVals[0] + "," + moveVals[1] + " " + moveVals[2] + "," + moveVals[3];
-                            saveMove(gameBoard, moveVals, 1);
+                            int[] ourCoords = getStateCoordinates(ourMove);
+
+                            //TODO: make update state func in Board
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
+//                            saveMove(gameBoard, moveVals, 1);
+
+
                             //Write to moveFile to end turn
                             overwriteFile(moveFile, ourMove);
+
                             System.out.println("sending move");
 
                         }
@@ -79,8 +103,9 @@ public class Gameplay {
                             //-----------------------------------------
 
                             String oppMove = fileContents(moveFile);
-                            int[] oppCoords = coordSanitization(oppMove);
-                            saveMove(gameBoard, oppCoords, -1);
+                            int[] oppCoords = getStateCoordinates(oppMove);
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
+//                            saveMove(gameBoard, oppCoords, -1);
 
                             //Write Empty move to moveFile
                             String passMove = "dannydevito 0,0 0,0";
@@ -90,7 +115,7 @@ public class Gameplay {
                     }
                 }
             }
-            gameBoard.printBoard();
+            gameBoard.printboard();
             // Reset the key
             boolean valid = key.reset();
             if (!valid) {
@@ -157,8 +182,13 @@ public class Gameplay {
     }
 
 
-    public static int[] coordSanitization(String move){
-        int[] coordVals = new int[5];
+    /**
+     * Gives the coordinates of our game array to update the line of
+     * @param move the string given by the move_file
+     * @return an int array of size 3 with the x and y value of the board array to update and the direction
+     */
+    public static int[] getStateCoordinates(String move){
+        int[] arrayCoordsToUpdate = new int[3];
 
         String coords = move.substring(move.length() - 7);
         String coord1 = coords.substring(0,3);
@@ -172,29 +202,28 @@ public class Gameplay {
         int x2 = Integer.parseInt(parts2[0]);
         int y2 = Integer.parseInt(parts2[1]);
 
+        //Ensure we have bottom left coord
         if(x2-x1 < 0 || y2-y1 < 0){
-            coordVals[0] = x2;
-            coordVals[1] = y2;
-            coordVals[2] = x1;
-            coordVals[3] = y1;
+            arrayCoordsToUpdate[0] = x2;
+            arrayCoordsToUpdate[1] = y2;
+
         } else{
-            coordVals[0] = x1;
-            coordVals[1] = y1;
-            coordVals[2] = x2;
-            coordVals[3] = y2;
+            arrayCoordsToUpdate[0] = x1;
+            arrayCoordsToUpdate[1] = y1;
         }
         if(x2-x1 != 0){
-            coordVals[4] = 0;
+            //Horizontal Line, add to x val
+            arrayCoordsToUpdate[0]++;
+            arrayCoordsToUpdate[2] = 0;
         } else {
-            coordVals[4] = 1;
+            //Vert Line, add to Y
+            arrayCoordsToUpdate[1]++;
+            arrayCoordsToUpdate[2] = 1;
         }
 
-        return coordVals;
+        return arrayCoordsToUpdate;
     }
 
 
-    public static void saveMove(Board board, int[] sanitizedCoords, int player){
-        board.updateLine(sanitizedCoords[0], sanitizedCoords[1], sanitizedCoords[4], player);
-    }
 
 }
