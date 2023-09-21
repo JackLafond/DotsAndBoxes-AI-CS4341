@@ -33,25 +33,32 @@ public class Board {
 	public int evaluate () {
 		return this.aiscore - this.playerscore;
 	}
-
-	//Prints the board
+	
 	public void printboard() {
-		for (int i = 0; i < BOARD_SIZE; i++ ) {
-			for (int j = 0; j < BOARD_SIZE; j ++) {
-				if (boardState[i][j] == DOT) {
-					System.out.print("." + " ");
+		for (int i = 0; i < BOARD_SIZE; i++) {
+			for (int j = 0; j < BOARD_SIZE; j++) {
+				char cellValue;
+				switch (boardState[i][j]) {
+					case DOT:
+						cellValue = '.';
+						break;
+					case BLANK_SPACE:
+					case EMPTY_LINE:
+						cellValue = ' ';
+						break;
+					case COMPLETED_LINE:
+						cellValue = '-';
+						break;
+					default:
+						cellValue = ' ';
 				}
-				else if (boardState[i][j] == BLANK_SPACE || boardState[i][j] == EMPTY_LINE){
-					System.out.print(" " + " ");
-				}
-				else if (boardState[i][j] == COMPLETED_LINE) {
-					System.out.print("-" + " ");
-				}
+				System.out.print(cellValue + " ");
 			}
 			System.out.println();
 		}
 		System.out.println();
 	}
+
 
 	public void updatescore (int row, int col, String direction) {
         
