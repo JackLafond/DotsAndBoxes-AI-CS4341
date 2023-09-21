@@ -19,19 +19,19 @@ public class Board {
 	}
 
 	public int[][] getState () {
-		return this.boardState;
+		return boardState;
 	}
 
 	public void updateplayerscore (int score) {
-		this.playerscore += score;
+		playerscore += score;
 	}
 
 	public void updateaiscore (int score) {
-		this.aiscore += score;
+		aiscore += score;
 	}
 
 	public int evaluate () {
-		return this.aiscore - this.playerscore;
+		return aiscore - this.playerscore;
 	}
 
 	public void printboard() {
