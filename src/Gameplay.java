@@ -57,7 +57,7 @@ public class Gameplay {
                             //TODO: update saveMove for new data structure
 //                            saveMove(gameBoard, oppCoords, -1);
                             //TODO: make update state func in Board
-                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], -1);
 
                             //TODO: Calculate Move
                             System.out.println("calculating move");
@@ -67,7 +67,7 @@ public class Gameplay {
                             int[] ourCoords = getStateCoordinates(ourMove);
 
                             //TODO: make update state func in Board
-                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
+                            gameBoard.updateState(ourCoords[0], ourCoords[1], ourCoords[2], 1);
 //                            saveMove(gameBoard, moveVals, 1);
 
 
@@ -87,7 +87,7 @@ public class Gameplay {
 
                             String oppMove = fileContents(moveFile);
                             int[] oppCoords = getStateCoordinates(oppMove);
-                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], -1);
 //                            saveMove(gameBoard, oppCoords, -1);
 
                             //Write Empty move to moveFile
