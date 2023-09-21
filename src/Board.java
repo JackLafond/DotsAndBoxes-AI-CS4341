@@ -63,4 +63,50 @@ public class Board {
 	public void updatescore (int row, int col, String direction) {
         
 	}
+
+	public void updateState(int x, int y, int direction, int player){
+		this.boardState[x][y] = COMPLETED_LINE;
+		if(direction == 0){
+			//Horizontal Line, check boxes above and below
+			if(y != 0){
+				//Check box below
+				isBoxComplete(x, y-1, player);
+			}
+			if(y != 18){
+				//check box above
+				isBoxComplete(x, y+1, player);
+			}
+		} else{
+			//Vertical line, check boxes left and right
+			if(x != 0){
+				//Check box left
+				isBoxComplete(x-1, y, player);
+			}
+			if(x != 18){
+				//check box right
+				isBoxComplete(x+1, y, player);
+			}
+		}
+	}
+
+	/**
+	 * Check to see if the box at this coordinate is complete or not. If so, update the value to the player id (1 or -1)
+	 * @param x x coordinate of box in state
+	 * @param y y coord of box in state
+	 * @param player player value (1 or -1)
+	 * @return true if the box is complete
+	 */
+	public boolean isBoxComplete(int x, int y, int player){
+		int topLine = this.boardState[x][y+1];
+		int bottomLine = this.boardState[x][y-1];
+		int rightLine = this.boardState[x+1][y];
+		int leftLine = this.boardState[x-1][y];
+
+		if(topLine == COMPLETED_LINE && bottomLine == COMPLETED_LINE && rightLine == COMPLETED_LINE && leftLine == COMPLETED_LINE){
+			this.boardState[x][y] = player;
+			return true;
+		}
+		else return false;
+	}
+
 }
