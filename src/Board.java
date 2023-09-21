@@ -33,10 +33,10 @@ public class Board {
 	public int evaluate () {
 		return this.aiscore - this.playerscore;
 	}
-	
+
 	public void printboard() {
-		for (int i = 0; i < BOARD_SIZE; i++) {
-			for (int j = 0; j < BOARD_SIZE; j++) {
+		for (int i = 0; i < boardState.length; i++) {
+			for (int j = 0; j < boardState.length; j++) {
 				char cellValue;
 				switch (boardState[i][j]) {
 					case DOT:
