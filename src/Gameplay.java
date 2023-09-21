@@ -52,22 +52,22 @@ public class Gameplay {
                             String oppMove = fileContents(moveFile);
                             //oppCoords is currently an int array size 2 that holds the relevant
                             //board array x and y values to be changed
-                            int[] oppCoords = coordSanitization(oppMove);
+                            int[] oppCoords = getStateCoordinates(oppMove);
 
                             //TODO: update saveMove for new data structure
 //                            saveMove(gameBoard, oppCoords, -1);
                             //TODO: make update state func in Board
-                            gameBoard.updateState(oppCoords[0], oppCoords[1], player);
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
 
                             //TODO: Calculate Move
                             System.out.println("calculating move");
                             int[] moveVals = Minimax.getBestMove(gameBoard);
 
                             String ourMove = "dannydevito " + moveVals[0] + "," + moveVals[1] + " " + moveVals[2] + "," + moveVals[3];
-                            int[] ourCoords = coordSanitization(ourMove);
+                            int[] ourCoords = getStateCoordinates(ourMove);
 
                             //TODO: make update state func in Board
-                            gameBoard.updateState(ourCoords[0], ourCoords[1], player);
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
 //                            saveMove(gameBoard, moveVals, 1);
 
 
@@ -86,8 +86,8 @@ public class Gameplay {
                             //-----------------------------------------
 
                             String oppMove = fileContents(moveFile);
-                            int[] oppCoords = coordSanitization(oppMove);
-                            gameBoard.updateState(oppCoords[0], oppCoords[1], player);
+                            int[] oppCoords = getStateCoordinates(oppMove);
+                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
 //                            saveMove(gameBoard, oppCoords, -1);
 
                             //Write Empty move to moveFile
@@ -168,10 +168,10 @@ public class Gameplay {
     /**
      * Gives the coordinates of our game array to update the line of
      * @param move the string given by the move_file
-     * @return an int array of size 2 with the x and y value of the board array to update
+     * @return an int array of size 3 with the x and y value of the board array to update and the direction
      */
-    public static int[] coordSanitization(String move){
-        int[] arrayCoordsToUpdate = new int[2];
+    public static int[] getStateCoordinates(String move){
+        int[] arrayCoordsToUpdate = new int[3];
 
         String coords = move.substring(move.length() - 7);
         String coord1 = coords.substring(0,3);
@@ -197,9 +197,11 @@ public class Gameplay {
         if(x2-x1 != 0){
             //Horizontal Line, add to x val
             arrayCoordsToUpdate[0]++;
+            arrayCoordsToUpdate[2] = 0;
         } else {
             //Vert Line, add to Y
             arrayCoordsToUpdate[1]++;
+            arrayCoordsToUpdate[2] = 1;
         }
 
         return arrayCoordsToUpdate;
