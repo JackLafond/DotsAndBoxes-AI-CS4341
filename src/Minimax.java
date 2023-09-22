@@ -8,9 +8,17 @@ public class Minimax {
 
 	//Move is called from main to initiate AI Move
 	public int[] getBestMove(Board b) {
-		
-		return search(b, 0, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
+		List<Board> children = getChildren(b);
+		int[] curBest = b.getLegalMoves().get(0);
+		for(Board child : children) {
+			int[] aBest = search(child, 0, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
+			if(aBest[2] >= curBest[2]) {
+				curBest = aBest;
+			}
+		}
+		return curBest;
+	
 	}
 
 	// returns an int of size 3 where int[2] is the minimax eval, 
@@ -24,7 +32,7 @@ public class Minimax {
 
 		List<Board> children = getChildren(b);
 
-		if(children.isEmpty() || depth == 5) {
+		if(children.isEmpty() || depth == 1) {
 			return new int[]{curLine[0], curLine[1], b.evaluate()};
 		}
 
@@ -69,14 +77,17 @@ public class Minimax {
         LinkedList<Board> children = new LinkedList<Board>();
         int[][] curState = b.getState();
         for(int row = 0; row < 19; row++) {
+			boolean shifted = false;
             for(int col = 0; col < 19; col = col + 2) {
-                if(row % 2 == 0) {
+                if(row % 2 == 0 && !shifted) {
                     col = col + 1;
+					shifted = true;
                 }
                 if(curState[row][col] == Board.EMPTY_LINE) {
                     int[][] newState = copyArray(curState, curState.length, curState.length);
-                    Board newB = new Board(newState, b.playerscore, b.aiscore, !b.myMove);
-					if(newB.completeLine(row, col)) {
+                    Board newB = new Board(newState, b.playerscore, b.aiscore, b.myMove);
+					boolean completeBox = newB.completeLine(row, col);
+					if(!completeBox) {
 						newB.myMove = !newB.myMove;
 					}
                     children.add(newB);

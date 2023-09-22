@@ -1,7 +1,6 @@
 //Each Board will hold information of the current boardState
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class Board {
 
@@ -46,19 +45,27 @@ public class Board {
 	}
 	
 	public void printboard() {
-		for (int i = 0; i < BOARD_SIZE; i++) {
-			for (int j = 0; j < BOARD_SIZE; j++) {
+		for (int i = 0; i < BOARD_SIZE * 2 + 1; i++) {
+			for (int j = 0; j < BOARD_SIZE * 2 + 1; j++) {
 				char cellValue;
 				switch (boardState[i][j]) {
 					case DOT:
 						cellValue = '.';
 						break;
 					case BLANK_SPACE:
+						cellValue = '0';
+						break;
 					case EMPTY_LINE:
 						cellValue = ' ';
 						break;
 					case COMPLETED_LINE:
 						cellValue = '-';
+						break;
+					case 1:
+						cellValue = '1';
+						break;
+					case -1:
+						cellValue = '!';
 						break;
 					default:
 						cellValue = ' ';
@@ -80,12 +87,14 @@ public class Board {
 		LinkedList<int[]> moves = new LinkedList<int[]>();
 
 		for(int row = 0; row < 19; row++) {
+			boolean shifted = false;
 			for(int col = 0; col < 19; col = col + 2) {
-                if(row % 2 == 0) {
+                if(row % 2 == 0 && !shifted) {
                     col = col + 1;
+					shifted = true;
                 }
 				if(boardState[row][col] == Board.EMPTY_LINE) {
-					moves.add(new int[]{row, col});
+					moves.add(new int[]{row, col, 0});
 				}
 			}
 		}
@@ -97,10 +106,27 @@ public class Board {
 
 		boardState[row][col] = Board.COMPLETED_LINE;
 		setLastLine(new int[]{row, col});
+		
 		if(row % 2 == 0) {
-			return checkBox(row-1, col) || checkBox(row+1, col);
+			if(row == 0) {
+				return checkBox(row+1, col);
+			} else if (row == 18) {
+				return checkBox(row-1, col);
+			} else {
+				boolean a = checkBox(row+1, col);
+				boolean b = checkBox(row-1, col);
+				return a || b;
+			}
 		} else {
-			return checkBox(row, col-1) || checkBox(row, col+1);
+			if(col == 0) {
+				return checkBox(row, col+1);
+			} else if(col == 18) {
+				return checkBox(row, col-1);
+			} else {
+				boolean a = checkBox(row, col-1);
+				boolean b = checkBox(row, col+1);
+				return a || b;
+			}
 		}
 	}
 
