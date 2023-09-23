@@ -49,8 +49,8 @@ public class Gameplay {
                 if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                     if(isFilePresent(endFile)){
                         //Game is Over
-                        String endfileContents = fileContents(endFile);
                         System.out.println("game over");
+                        String endfileContents = fileContents(endFile);
                         System.out.println(endfileContents);
                         gameRunning = false;
                     } else{
@@ -69,8 +69,10 @@ public class Gameplay {
                             //oppCoords is currently an int array size 2 that holds the relevant
                             //board array x and y values to be changed
                             if(oppMove == null){
+                                System.out.println("We start");
                                 gameBoard.myMove = true;
                             } else {
+                                System.out.println("saving opp move");
                                 int[] oppCoords = getArrayCoordinates(oppMove);
                                 gameBoard.completeMove(oppCoords[0], oppCoords[1]);
                             }
@@ -81,6 +83,8 @@ public class Gameplay {
 
                             String moveString = "dannydevito " + ourMove[0] + "," + ourMove[1] + " " + ourMove[2] + "," + ourMove[3];
                             int[] ourCoords = getArrayCoordinates(moveString);
+
+                            System.out.println(moveString);
 
                             gameBoard.completeMove(ourCoords[0], ourCoords[1]);
 
