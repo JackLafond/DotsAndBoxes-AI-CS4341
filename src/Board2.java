@@ -1,6 +1,10 @@
 //Each Board will hold information of the current boardState
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Board2 {
 
@@ -82,9 +86,9 @@ public class Board2 {
         
 	}
 
-	public LinkedList<int[]> getLegalMoves() {
+	public List<int[]> getSortedLegalMoves() {
 
-		LinkedList<int[]> moves = new LinkedList<int[]>();
+		List<int[]> moves = new ArrayList<int[]>();
 
 		for(int row = 0; row < 19; row++) {
 			boolean shifted = false;
@@ -99,7 +103,7 @@ public class Board2 {
 			}
 		}
 
-		return moves;
+		return sortMoves(moves);
 	}
 
 	public boolean completeMove(int row, int col) {
@@ -226,5 +230,39 @@ public class Board2 {
 		if(boardState[i][j+1] == COMPLETED_LINE) countCompleted++;
 		if(boardState[i][j-1] == COMPLETED_LINE) countCompleted++;
 		return countCompleted;
+	}
+
+	
+	public List<int[]> sortMoves(List<int[]> moveList) {
+        if (moveList.size() > 40) {
+            // Create a custom comparator to sort boards by numLinesOnBox in descending order
+			Comparator<int[]> comparator = (board1, board2) -> {
+        	int priority1 = getPriority(board1);
+        	int priority2 = getPriority(board2);
+        	return Integer.compare(priority2, priority1);
+    	};
+            Collections.sort(moveList, comparator);
+
+            return moveList.subList(0, 40);
+        } else {
+            return moveList;
+        }
+    }
+
+	private int getPriority(int[] move) {
+		completeMove(move[0], move[1]);
+		int maxLinesOnBox = maxLinesOnBox();
+		undoMove(move[0], move[1]);
+
+		if (maxLinesOnBox == 3) {
+			return 0; // Highest priority for 3's
+		} else if (maxLinesOnBox == 1) {
+			return 1; // Next priority for 1's
+		} else if (maxLinesOnBox == 0) {
+			return 2; // Priority for 0's
+		} else {
+			return 3; // Lowest priority for 2's
+		}
+		
 	}
 }

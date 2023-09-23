@@ -1,7 +1,4 @@
 import java.util.List;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
 
 //This class handles the AI movements
 public class Minimax2 {
@@ -19,14 +16,14 @@ public class Minimax2 {
 	// int[0] is the row of the line, and int[1] is the column of the line (in our 19x19 array)
 	public int[] search(Board2 b, int depth, boolean isMaxing, int alpha, int beta) {
 
-		LinkedList<int[]> moves = b.getLegalMoves();
+		List<int[]> moves = b.getSortedLegalMoves();
 
 		if(moves.isEmpty() || depth == 3) {
 			int[] curMove = b.madeMoves.getLast();
 			return new int[]{curMove[0], curMove[1], b.evaluate()};
 		}
 
-		int[] curMove = b.getLegalMoves().getFirst();
+		int[] curMove = moves.get(0);
 		
 		if(isMaxing) {
 
@@ -79,60 +76,6 @@ public class Minimax2 {
 			tempNode = tempNode.parent;
 		}
 		return tempNode;
-	}
-
-    public List<Board> getChildren(Board b) {
-        LinkedList<Board> children = new LinkedList<Board>();
-        int[][] curState = b.getState();
-        for(int row = 0; row < 19; row++) {
-			boolean shifted = false;
-            for(int col = 0; col < 19; col = col + 2) {
-                if(row % 2 == 0 && !shifted) {
-                    col = col + 1;
-					shifted = true;
-                }
-                if(curState[row][col] == Board.EMPTY_LINE) {
-                    int[][] newState = copyArray(curState, curState.length, curState.length);
-                    Board newB = new Board(newState, b.playerscore, b.aiscore, b.myMove);
-					boolean completeBox = newB.completeLine(row, col);
-					if(!completeBox) {
-						newB.myMove = !newB.myMove;
-					}
-                    children.add(newB);
-                }
-            }
-        }
-        return children;
-
-    }
-
-	    public List<Board2> sortChildren(List<Board2> boardList) {
-        if (boardList.size() > 40) {
-            // Create a custom comparator to sort boards by numLinesOnBox in descending order
-                Comparator<Board2> comparator = (board1, board2) -> {
-        	int priority1 = getPriority(board1);
-        	int priority2 = getPriority(board2);
-        	return Integer.compare(priority2, priority1);
-    	};
-            Collections.sort(boardList, comparator);
-
-            return boardList.subList(0, 40);
-        } else {
-            return boardList;
-        }
-    }
-
-	private int getPriority(Board2 board) {
-		int maxLinesOnBox = board.maxLinesOnBox();
-		if (maxLinesOnBox == 3) {
-			return 0; // Highest priority for 3's
-		} else if (maxLinesOnBox == 1) {
-			return 1; // Next priority for 1's
-		} else if (maxLinesOnBox == 0) {
-			return 2; // Priority for 0's
-		} else {
-			return 3; // Lowest priority for 2's
-		}
 	}
 
 	public int[][] copyArray (int[][] state, int rows, int cols) {
