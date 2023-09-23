@@ -69,13 +69,15 @@ public class Gameplay {
                             //oppCoords is currently an int array size 2 that holds the relevant
                             //board array x and y values to be changed
                             if(oppMove.equals("")){
-                                System.out.println("We start");
+                                System.out.println("We have first turn");
                                 gameBoard.myMove = true;
                             } else {
                                 System.out.println("saving opp move");
                                 System.out.println(oppMove);
                                 int[] oppCoords = getArrayCoordinates(oppMove);
                                 gameBoard.completeMove(oppCoords[0], oppCoords[1]);
+
+                                gameBoard.printboard();
                             }
 
                             System.out.println("calculating move");
@@ -94,6 +96,8 @@ public class Gameplay {
 
                             System.out.println("sending move");
 
+                            gameBoard.printboard();
+
                         }
                         else if (fileName.equals(passFile)){
 
@@ -107,6 +111,8 @@ public class Gameplay {
                             int[] oppCoords = getArrayCoordinates(oppMove);
                             gameBoard.completeMove(oppCoords[0], oppCoords[1]);
 
+                            gameBoard.printboard();
+
                             //Write Empty move to moveFile
                             String passMove = "dannydevito 0,0 0,0";
                             overwriteFile(moveFile, passMove);
@@ -115,7 +121,7 @@ public class Gameplay {
                     }
                 }
             }
-            gameBoard.printboard();
+
             // Reset the key
             boolean valid = key.reset();
             if (!valid) {
@@ -205,12 +211,12 @@ public class Gameplay {
 
         //Ensure we have bottom left coord
         if(x2-x1 < 0 || y2-y1 < 0){
-            arrayCoordsToUpdate[0] = x2;
-            arrayCoordsToUpdate[1] = y2;
+            arrayCoordsToUpdate[0] = x2 *2;
+            arrayCoordsToUpdate[1] = y2 *2;
 
         } else{
-            arrayCoordsToUpdate[0] = x1;
-            arrayCoordsToUpdate[1] = y1;
+            arrayCoordsToUpdate[0] = x1 *2;
+            arrayCoordsToUpdate[1] = y1 *2;
         }
         if(x2-x1 != 0){
             //Horizontal Line, add to x val
