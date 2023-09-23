@@ -110,7 +110,7 @@ public class Minimax2 {
     	};
             Collections.sort(boardList, comparator);
 
-            return boardList.subList(boardList.size()-40, boardList.size());
+            return boardList.subList(0, 40);
         } else {
             return boardList;
         }
