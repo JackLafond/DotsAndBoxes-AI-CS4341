@@ -68,11 +68,12 @@ public class Gameplay {
                             String oppMove = fileContents(moveFile);
                             //oppCoords is currently an int array size 2 that holds the relevant
                             //board array x and y values to be changed
-                            if(oppMove == null){
+                            if(oppMove.equals("")){
                                 System.out.println("We start");
                                 gameBoard.myMove = true;
                             } else {
                                 System.out.println("saving opp move");
+                                System.out.println(oppMove);
                                 int[] oppCoords = getArrayCoordinates(oppMove);
                                 gameBoard.completeMove(oppCoords[0], oppCoords[1]);
                             }
@@ -173,7 +174,8 @@ public class Gameplay {
      */
     public static String fileContents(String fileName) throws IOException {
         try{
-            return Files.readString(Path.of(fileName));
+
+            return Files.readString(directoryPath.resolve(fileName));
         } catch (IOException e){
             e.printStackTrace();
             return null;
