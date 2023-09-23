@@ -189,4 +189,42 @@ public class Board2 {
 		}
 		return false;
 	}
+
+	public int maxLinesOnBox() {
+		int[] last = madeMoves.getLast();
+		//check if vertical or horisontal
+		if(last[0] % 2 == 0){
+			//check if bottom or top
+			if(last[0] == 0){
+				return getLines(last[0],last[1]+1);
+			}
+			else if(last[0] == 9){
+				return getLines(last[0],last[1]-1);
+			}
+			else{
+				return Math.max(getLines(last[0],last[1]+1), getLines(last[0],last[1]-1));
+			}
+		}
+		else{
+			//check if left or right
+			if(last[0] == 0){
+				return getLines(last[0]+1,last[1]);
+			}
+			else if(last[0] == 9){
+				return getLines(last[0]-1,last[1]);
+			}
+			else{
+				return Math.max(getLines(last[0]+1,last[1]), getLines(last[0]-1,last[1]));
+			}
+		}
+	}
+
+	private int getLines(int i, int j) {
+		int countCompleted = 0;
+		if(boardState[i+1][j] == COMPLETED_LINE) countCompleted++;
+		if(boardState[i-1][j] == COMPLETED_LINE) countCompleted++;
+		if(boardState[i][j+1] == COMPLETED_LINE) countCompleted++;
+		if(boardState[i][j-1] == COMPLETED_LINE) countCompleted++;
+		return countCompleted;
+	}
 }

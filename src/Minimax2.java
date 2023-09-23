@@ -1,4 +1,6 @@
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 //This class handles the AI movements
@@ -96,6 +98,18 @@ public class Minimax2 {
         }
         return children;
 
+    }
+
+	    public List<Board2> sortChildren(List<Board2> boardList) {
+        if (boardList.size() > 40) {
+            // Create a custom comparator to sort boards by numLinesOnBox in descending order
+            Comparator<Board2> comparator = (board1, board2) -> Integer.compare(board2.maxLinesOnBox(), board1.maxLinesOnBox());
+            Collections.sort(boardList, comparator);
+
+            return boardList.subList(boardList.size()-40, boardList.size());
+        } else {
+            return boardList;
+        }
     }
 
 	public int[][] copyArray (int[][] state, int rows, int cols) {
