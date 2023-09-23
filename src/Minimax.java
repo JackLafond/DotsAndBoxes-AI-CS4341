@@ -1,4 +1,6 @@
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 //This class handles the AI movements

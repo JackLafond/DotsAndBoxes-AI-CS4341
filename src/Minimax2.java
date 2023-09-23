@@ -1,4 +1,6 @@
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 //This class handles the AI movements
@@ -19,7 +21,7 @@ public class Minimax2 {
 
 		LinkedList<int[]> moves = b.getLegalMoves();
 
-		if(moves.isEmpty() || depth == 4) {
+		if(moves.isEmpty() || depth == 3) {
 			int[] curMove = b.madeMoves.getLast();
 			return new int[]{curMove[0], curMove[1], b.evaluate()};
 		}
@@ -35,7 +37,10 @@ public class Minimax2 {
 					b.myMove = !b.myMove;
 				}
 				int[] aMove = search(b, depth + 1, b.myMove, alpha, beta);
-				bestMove[2] = Math.max(bestMove[2], aMove[2]);
+				//bestMove[2] = Math.max(bestMove[2], aMove[2]);
+				if(aMove[2] > bestMove[2]) {
+					bestMove = aMove;
+				}
 				alpha = Math.max(bestMove[2], alpha);
 				b.undoMove(move[0], move[1]);
 				if(alpha >= beta) {
@@ -53,7 +58,10 @@ public class Minimax2 {
 					b.myMove = !b.myMove;
 				}
 				int[] aMove = search(b, depth + 1, b.myMove, alpha, beta);
-				bestMove[2] = Math.min(bestMove[2], aMove[2]);
+				// bestMove[2] = Math.min(bestMove[2], aMove[2]);
+				if(aMove[2] < bestMove[2]) {
+					bestMove = aMove;
+				}
 				beta = Math.min(bestMove[2], beta);
 				b.undoMove(move[0], move[1]);
 				if(alpha >= beta) {
@@ -97,6 +105,35 @@ public class Minimax2 {
         return children;
 
     }
+
+	    public List<Board2> sortChildren(List<Board2> boardList) {
+        if (boardList.size() > 40) {
+            // Create a custom comparator to sort boards by numLinesOnBox in descending order
+                Comparator<Board2> comparator = (board1, board2) -> {
+        	int priority1 = getPriority(board1);
+        	int priority2 = getPriority(board2);
+        	return Integer.compare(priority2, priority1);
+    	};
+            Collections.sort(boardList, comparator);
+
+            return boardList.subList(0, 40);
+        } else {
+            return boardList;
+        }
+    }
+
+	private int getPriority(Board2 board) {
+		int maxLinesOnBox = board.maxLinesOnBox();
+		if (maxLinesOnBox == 3) {
+			return 0; // Highest priority for 3's
+		} else if (maxLinesOnBox == 1) {
+			return 1; // Next priority for 1's
+		} else if (maxLinesOnBox == 0) {
+			return 2; // Priority for 0's
+		} else {
+			return 3; // Lowest priority for 2's
+		}
+	}
 
 	public int[][] copyArray (int[][] state, int rows, int cols) {
 		int[][] temp = new int[rows][cols];
