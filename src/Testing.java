@@ -17,39 +17,47 @@ public class Testing {
             }
         }
 
-        //SHOULD IA Move be false here??
-        Board b = new Board(array, 0, 0, true);
+        // testing minimax
 
-        b.completeLine(0, 1);
-        b.completeLine(1,0);
-        b.completeLine(5, 0);
-        b.completeLine(0, 17);
-        b.completeLine(1, 18);
-        b.completeLine(17, 0);
-        b.completeLine(18, 1);
-        b.completeLine(18, 17);
-        b.completeLine(17, 18);
-        b.completeLine(0, 5);
-        b.completeLine(9, 18);
-        b.completeLine(18, 9);
-        b.completeLine(1, 2);
+        Board2 b = new Board2(array, 0, 0, true);
+
+        b.completeMove(0, 1);
+        b.completeMove(1,0);
+        b.completeMove(5, 0);
+        b.completeMove(0, 17);
+        b.completeMove(1, 18);
+        b.completeMove(17, 0);
+        b.completeMove(18, 1);
+        b.completeMove(18, 17);
+        b.completeMove(17, 18);
+        b.completeMove(0, 5);
+        b.completeMove(9, 18);
+        b.completeMove(18, 9);
+        b.completeMove(1, 2);
         b.myMove = false;
-        b.completeLine(1, 16);
-        b.completeLine(2, 17);
+        b.completeMove(1, 16);
+        b.completeMove(2, 17);
         b.myMove = true;
-        b.completeLine(3, 0);
-        b.completeLine(6, 1);
-        b.completeLine(3, 2);
-        b.completeLine(0, 3);
-        b.completeLine(2, 3);
-        b.completeLine(2, 5);
-        b.completeLine(2, 1);
-        b.completeLine(1, 4);
+        b.completeMove(3, 0);
+        b.completeMove(6, 1);
+        b.completeMove(3, 2);
+        b.completeMove(0, 3);
+        b.completeMove(2, 3);
+        b.completeMove(2, 5);
+        b.completeMove(2, 1);
+        b.completeMove(1, 4);
+        b.completeMove(5, 2);
+        b.printboard();
+        System.out.println("Board eval: " + b.evaluate());
+        System.out.println("Board Moves: " + b.madeMoves);
+        Minimax2 m = new Minimax2();
+        int[] move = m.getBestMove(b);
+        System.out.println("Board eval: " + b.evaluate());
+        System.out.println("Board Moves: " + b.madeMoves);
+        System.out.println("Best move is : " + move[0] + ", " + move[1] + " with an eval of : " + move[2]);
+
         b.printboard();
 
-        Minimax m = new Minimax();
-        int[] move = m.getBestMove(b);
-        System.out.println("Best move is : " + move[0] + ", " + move[1] + " with an eval of : " + move[2]);
 
     }
 
