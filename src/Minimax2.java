@@ -7,7 +7,7 @@ public class Minimax2 {
 	public Minimax2 () {}
 
 	//Move is called from main to initiate AI Move
-	public int[] getBestMove(Board2 b) {
+	public static int[] getBestMove(Board2 b) {
 
 		return search(b, 0, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
 	
@@ -15,7 +15,7 @@ public class Minimax2 {
 
 	// returns an int of size 3 where int[2] is the minimax eval, 
 	// int[0] is the row of the line, and int[1] is the column of the line (in our 19x19 array)
-	public int[] search(Board2 b, int depth, boolean isMaxing, int alpha, int beta) {
+	public static int[] search(Board2 b, int depth, boolean isMaxing, int alpha, int beta) {
 
 		LinkedList<int[]> moves = b.getLegalMoves();
 
