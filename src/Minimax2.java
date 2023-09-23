@@ -68,23 +68,4 @@ public class Minimax2 {
 			return bestMove;
 		}
 	}
-
-	public Node getMove (Node current) {
-		Node tempNode = current;
-
-		while (tempNode.parent.parent != null) {
-			tempNode = tempNode.parent;
-		}
-		return tempNode;
-	}
-
-	public int[][] copyArray (int[][] state, int rows, int cols) {
-		int[][] temp = new int[rows][cols];
-		for (int i = 0; i < rows; i ++) {
-			for (int j = 0; j < cols; j++) {
-				temp[i][j] = state[i][j];
-			}
-		}
-		return temp;
-	}
 }
