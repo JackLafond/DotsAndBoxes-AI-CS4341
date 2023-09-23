@@ -103,7 +103,11 @@ public class Minimax2 {
 	    public List<Board2> sortChildren(List<Board2> boardList) {
         if (boardList.size() > 40) {
             // Create a custom comparator to sort boards by numLinesOnBox in descending order
-            Comparator<Board2> comparator = (board1, board2) -> Integer.compare(board2.maxLinesOnBox(), board1.maxLinesOnBox());
+                Comparator<Board2> comparator = (board1, board2) -> {
+        	int priority1 = getPriority(board1);
+        	int priority2 = getPriority(board2);
+        	return Integer.compare(priority2, priority1);
+    	};
             Collections.sort(boardList, comparator);
 
             return boardList.subList(boardList.size()-40, boardList.size());
@@ -111,6 +115,19 @@ public class Minimax2 {
             return boardList;
         }
     }
+
+	private int getPriority(Board2 board) {
+		int maxLinesOnBox = board.maxLinesOnBox();
+		if (maxLinesOnBox == 3) {
+			return 0; // Highest priority for 3's
+		} else if (maxLinesOnBox == 1) {
+			return 1; // Next priority for 1's
+		} else if (maxLinesOnBox == 0) {
+			return 2; // Priority for 0's
+		} else {
+			return 3; // Lowest priority for 2's
+		}
+	}
 
 	public int[][] copyArray (int[][] state, int rows, int cols) {
 		int[][] temp = new int[rows][cols];
