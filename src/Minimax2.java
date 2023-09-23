@@ -21,7 +21,7 @@ public class Minimax2 {
 
 		LinkedList<int[]> moves = b.getLegalMoves();
 
-		if(moves.isEmpty() || depth == 4) {
+		if(moves.isEmpty() || depth == 3) {
 			int[] curMove = b.madeMoves.getLast();
 			return new int[]{curMove[0], curMove[1], b.evaluate()};
 		}
@@ -37,7 +37,10 @@ public class Minimax2 {
 					b.myMove = !b.myMove;
 				}
 				int[] aMove = search(b, depth + 1, b.myMove, alpha, beta);
-				bestMove[2] = Math.max(bestMove[2], aMove[2]);
+				//bestMove[2] = Math.max(bestMove[2], aMove[2]);
+				if(aMove[2] > bestMove[2]) {
+					bestMove = aMove;
+				}
 				alpha = Math.max(bestMove[2], alpha);
 				b.undoMove(move[0], move[1]);
 				if(alpha >= beta) {
@@ -55,7 +58,10 @@ public class Minimax2 {
 					b.myMove = !b.myMove;
 				}
 				int[] aMove = search(b, depth + 1, b.myMove, alpha, beta);
-				bestMove[2] = Math.min(bestMove[2], aMove[2]);
+				// bestMove[2] = Math.min(bestMove[2], aMove[2]);
+				if(aMove[2] < bestMove[2]) {
+					bestMove = aMove;
+				}
 				beta = Math.min(bestMove[2], beta);
 				b.undoMove(move[0], move[1]);
 				if(alpha >= beta) {

@@ -178,13 +178,13 @@ public class Board2 {
 	}
 
 	public boolean undoBox(int row, int col) {
-		if(boardState[row][col] != Board.BLANK_SPACE) {
+		if(boardState[row][col] == 1) {
 			boardState[row][col] = Board.BLANK_SPACE;
-			if(myMove) {
-				aiscore = aiscore - 1;
-			} else {
-				playerscore = playerscore - 1;
-			}
+			aiscore = aiscore - 1;
+			return true;
+		} else if(boardState[row][col] == -1) {
+			boardState[row][col] = Board.BLANK_SPACE;
+			playerscore = playerscore - 1;
 			return true;
 		}
 		return false;
