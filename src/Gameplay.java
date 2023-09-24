@@ -14,8 +14,7 @@ public class Gameplay {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         boolean gameRunning = true;
-        Path dir = Paths.get(System.getProperty("user.dir")); //Can manually change Directory as necessary
-        dir = directoryPath;
+        Path dir = directoryPath;
         //-----------------------------------------
         System.out.println(dir);
         //-----------------------------------------
@@ -42,7 +41,7 @@ public class Gameplay {
         }
 
         //SHOULD IA Move be false here??
-        Board gameBoard = new Board(array, 0, 0, false);
+        Board2 gameBoard = new Board2(array, 0, 0, false);
 
         while(gameRunning){
             WatchKey key = watchService.take();
@@ -50,8 +49,8 @@ public class Gameplay {
                 if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
                     if(isFilePresent(endFile)){
                         //Game is Over
-                        String endfileContents = fileContents(endFile);
                         System.out.println("game over");
+                        String endfileContents = fileContents(endFile);
                         System.out.println(endfileContents);
                         gameRunning = false;
                     } else{
@@ -69,29 +68,35 @@ public class Gameplay {
                             String oppMove = fileContents(moveFile);
                             //oppCoords is currently an int array size 2 that holds the relevant
                             //board array x and y values to be changed
-                            int[] oppCoords = getStateCoordinates(oppMove);
+                            if(oppMove.equals("")){
+                                System.out.println("We have first turn");
+                                gameBoard.myMove = true;
+                            } else {
+                                System.out.println("saving opp move");
+                                System.out.println(oppMove);
+                                int[] oppCoords = getArrayCoordinates(oppMove);
+                                gameBoard.completeMove(oppCoords[0], oppCoords[1]);
 
-                            //TODO: update saveMove for new data structure
-//                            saveMove(gameBoard, oppCoords, -1);
-                            //TODO: make update state func in Board
-                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
+                                gameBoard.printboard();
+                            }
 
-                            //TODO: Calculate Move
                             System.out.println("calculating move");
-                            int[] moveVals = Minimax.getBestMove(gameBoard);
+                            int[] moveVals = Minimax2.getBestMove(gameBoard);
+                            int[] ourMove = arrayToBoardCoords(moveVals[0], moveVals[1]);
 
-                            String ourMove = "dannydevito " + moveVals[0] + "," + moveVals[1] + " " + moveVals[2] + "," + moveVals[3];
-                            int[] ourCoords = getStateCoordinates(ourMove);
+                            String moveString = "dannydevito " + ourMove[0] + "," + ourMove[1] + " " + ourMove[2] + "," + ourMove[3];
+                            int[] ourCoords = getArrayCoordinates(moveString);
 
-                            //TODO: make update state func in Board
-                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
-//                            saveMove(gameBoard, moveVals, 1);
+                            System.out.println(moveString);
 
+                            gameBoard.completeMove(ourCoords[0], ourCoords[1]);
 
                             //Write to moveFile to end turn
-                            overwriteFile(moveFile, ourMove);
+                            overwriteFile(moveFile, moveString);
 
                             System.out.println("sending move");
+
+                            gameBoard.printboard();
 
                         }
                         else if (fileName.equals(passFile)){
@@ -103,9 +108,10 @@ public class Gameplay {
                             //-----------------------------------------
 
                             String oppMove = fileContents(moveFile);
-                            int[] oppCoords = getStateCoordinates(oppMove);
-                            gameBoard.updateState(oppCoords[0], oppCoords[1], oppCoords[2], player);
-//                            saveMove(gameBoard, oppCoords, -1);
+                            int[] oppCoords = getArrayCoordinates(oppMove);
+                            gameBoard.completeMove(oppCoords[0], oppCoords[1]);
+
+                            gameBoard.printboard();
 
                             //Write Empty move to moveFile
                             String passMove = "dannydevito 0,0 0,0";
@@ -115,7 +121,7 @@ public class Gameplay {
                     }
                 }
             }
-            gameBoard.printboard();
+
             // Reset the key
             boolean valid = key.reset();
             if (!valid) {
@@ -174,7 +180,8 @@ public class Gameplay {
      */
     public static String fileContents(String fileName) throws IOException {
         try{
-            return Files.readString(Path.of(fileName));
+
+            return Files.readString(directoryPath.resolve(fileName));
         } catch (IOException e){
             e.printStackTrace();
             return null;
@@ -187,7 +194,7 @@ public class Gameplay {
      * @param move the string given by the move_file
      * @return an int array of size 3 with the x and y value of the board array to update and the direction
      */
-    public static int[] getStateCoordinates(String move){
+    public static int[] getArrayCoordinates(String move){
         int[] arrayCoordsToUpdate = new int[3];
 
         String coords = move.substring(move.length() - 7);
@@ -204,12 +211,12 @@ public class Gameplay {
 
         //Ensure we have bottom left coord
         if(x2-x1 < 0 || y2-y1 < 0){
-            arrayCoordsToUpdate[0] = x2;
-            arrayCoordsToUpdate[1] = y2;
+            arrayCoordsToUpdate[0] = x2 *2;
+            arrayCoordsToUpdate[1] = y2 *2;
 
         } else{
-            arrayCoordsToUpdate[0] = x1;
-            arrayCoordsToUpdate[1] = y1;
+            arrayCoordsToUpdate[0] = x1 *2;
+            arrayCoordsToUpdate[1] = y1 *2;
         }
         if(x2-x1 != 0){
             //Horizontal Line, add to x val
@@ -224,6 +231,24 @@ public class Gameplay {
         return arrayCoordsToUpdate;
     }
 
-
+    public static int[] arrayToBoardCoords(int x, int y){
+        int[] boardCoords = new int[4];
+        if(x % 2 == 1){
+            //X is odd, we know it is a vert line
+            //Need x above and below, y stays the same
+            boardCoords[0] = (x-1) / 2;
+            boardCoords[1] = y/2;
+            boardCoords[2] = (x+1) / 2;
+            boardCoords[3] = y/2;
+        } else{
+            //x is even, horiz line
+            //need differences in y
+            boardCoords[0] = x/2;
+            boardCoords[1] = (y-1)/2;
+            boardCoords[2] = x/2;
+            boardCoords[3] = (y+1)/2;
+        }
+        return boardCoords;
+    }
 
 }
