@@ -58,16 +58,12 @@ public class Gameplay {
                         String fileName = filePath.getFileName().toString();
 
                         if(fileName.equals(goFile)){
-                            //TODO: Make a move here
-
                             //-----------------------------------------
                             System.out.println("GO File Detected!");
                             //-----------------------------------------
 
-                            //Log opponents Move info here, make into a single func (used 2x)
                             String oppMove = fileContents(moveFile);
-                            //oppCoords is currently an int array size 2 that holds the relevant
-                            //board array x and y values to be changed
+
                             if(oppMove.equals("")){
                                 System.out.println("We have first turn");
                                 gameBoard.myMove = true;
@@ -75,10 +71,12 @@ public class Gameplay {
                                 gameBoard.myMove = false;
                                 System.out.println("saving opp move");
                                 System.out.println(oppMove);
-                                int[] oppCoords = getArrayCoordinates(oppMove);
-                                gameBoard.completeMove(oppCoords[0], oppCoords[1]);
+                                if(!isPassMove(oppMove)) {
+                                    int[] oppCoords = getArrayCoordinates(oppMove);
+                                    gameBoard.completeMove(oppCoords[0], oppCoords[1]);
 
-                                gameBoard.printboard();
+                                    gameBoard.printboard();
+                                }
                             }
 
                             System.out.println("calculating move");
@@ -237,6 +235,15 @@ public class Gameplay {
         }
 
         return arrayCoordsToUpdate;
+    }
+
+    public static boolean isPassMove(String input) {
+        if (input.length() < 7) {
+            return false;
+        }
+        String coordText = input.substring(input.length() - 7);
+
+        return coordText.equals("0,0 0,0");
     }
 
     public static int[] arrayToBoardCoords(int x, int y){
