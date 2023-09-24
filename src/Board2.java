@@ -63,6 +63,9 @@ public class Board2 {
 						cellValue = ' ';
 						break;
 					case COMPLETED_LINE:
+						if(i % 2 == 1){
+							cellValue ='|';
+						} else
 						cellValue = '-';
 						break;
 					case 1:

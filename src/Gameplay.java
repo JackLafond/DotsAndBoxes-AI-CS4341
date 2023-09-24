@@ -10,7 +10,7 @@ public class Gameplay {
     public static final String passFile = "dannydevito.pass";
     public static final String endFile = "end_game";
 
-    public static final Path directoryPath = Path.of("C:\\Users\\Aidan\\Desktop\\Intro to AI\\dots_boxes_referee\\dots_boxes_referee");
+    public static final Path directoryPath = Path.of("C:\\Users\\Aidan\\Desktop\\Intro to AI\\refereeV5\\refereeV5\\refereeV5\\dots_boxes_referee");
 
     public static void main(String[] args) throws IOException, InterruptedException {
         boolean gameRunning = true;
@@ -72,6 +72,7 @@ public class Gameplay {
                                 System.out.println("We have first turn");
                                 gameBoard.myMove = true;
                             } else {
+                                gameBoard.myMove = false;
                                 System.out.println("saving opp move");
                                 System.out.println(oppMove);
                                 int[] oppCoords = getArrayCoordinates(oppMove);
@@ -81,6 +82,9 @@ public class Gameplay {
                             }
 
                             System.out.println("calculating move");
+                            long startTime = System.nanoTime();
+
+                            gameBoard.myMove = true;
                             int[] moveVals = Minimax2.getBestMove(gameBoard);
                             int[] ourMove = arrayToBoardCoords(moveVals[0], moveVals[1]);
 
@@ -95,6 +99,10 @@ public class Gameplay {
                             overwriteFile(moveFile, moveString);
 
                             System.out.println("sending move");
+                            long endTime = System.nanoTime();
+                            long elapsedTimeMs = (endTime - startTime) / 1000000000; // Convert nanoseconds to milliseconds
+                            System.out.println("Elapsed time: " + elapsedTimeMs + " seconds");
+
 
                             gameBoard.printboard();
 
@@ -106,7 +114,7 @@ public class Gameplay {
                             //-----------------------------------------
                             System.out.println("PASS File Detected!\n");
                             //-----------------------------------------
-
+                            gameBoard.myMove = false;
                             String oppMove = fileContents(moveFile);
                             int[] oppCoords = getArrayCoordinates(oppMove);
                             gameBoard.completeMove(oppCoords[0], oppCoords[1]);
