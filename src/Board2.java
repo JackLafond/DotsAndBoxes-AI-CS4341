@@ -97,7 +97,7 @@ public class Board2 {
                     col = col + 1;
 					shifted = true;
                 }
-				if(boardState[row][col] == Board.EMPTY_LINE) {
+				if(boardState[row][col] == Board2.EMPTY_LINE) {
 					moves.add(new int[]{row, col, 0});
 				}
 			}
@@ -106,9 +106,29 @@ public class Board2 {
 		return sortMoves(moves);
 	}
 
+	public List<int[]> getLegalMoves() {
+
+		List<int[]> moves = new ArrayList<int[]>();
+
+		for(int row = 0; row < 19; row++) {
+			boolean shifted = false;
+			for(int col = 0; col < 19; col = col + 2) {
+                if(row % 2 == 0 && !shifted) {
+                    col = col + 1;
+					shifted = true;
+                }
+				if(boardState[row][col] == Board2.EMPTY_LINE) {
+					moves.add(new int[]{row, col, 0});
+				}
+			}
+		}
+
+		return moves;
+	}
+
 	public boolean completeMove(int row, int col) {
 
-		boardState[row][col] = Board.COMPLETED_LINE;
+		boardState[row][col] = Board2.COMPLETED_LINE;
 		addMadeMove(new int[]{row, col});
 		
 		if(row % 2 == 0) {
@@ -136,7 +156,7 @@ public class Board2 {
 
 	public boolean undoMove(int row, int col) {
 
-		boardState[row][col] = Board.EMPTY_LINE;
+		boardState[row][col] = Board2.EMPTY_LINE;
 		this.madeMoves.removeLast();
 
 		if(row % 2 == 0) {
@@ -163,9 +183,9 @@ public class Board2 {
 	}
 
 	public boolean checkBox(int row, int col) {
-		if(boardState[row][col] == Board.BLANK_SPACE) {
+		if(boardState[row][col] == Board2.BLANK_SPACE) {
 			int sum = boardState[row][col + 1] + boardState[row][col - 1] + boardState[row - 1][col] + boardState[row + 1][col];
-			if(sum == 4 * Board.COMPLETED_LINE) {
+			if(sum == 4 * Board2.COMPLETED_LINE) {
 				if(myMove) {
 					boardState[row][col] = 1;
 					aiscore = aiscore + 1;
@@ -183,11 +203,11 @@ public class Board2 {
 
 	public boolean undoBox(int row, int col) {
 		if(boardState[row][col] == 1) {
-			boardState[row][col] = Board.BLANK_SPACE;
+			boardState[row][col] = Board2.BLANK_SPACE;
 			aiscore = aiscore - 1;
 			return true;
 		} else if(boardState[row][col] == -1) {
-			boardState[row][col] = Board.BLANK_SPACE;
+			boardState[row][col] = Board2.BLANK_SPACE;
 			playerscore = playerscore - 1;
 			return true;
 		}
@@ -200,25 +220,25 @@ public class Board2 {
 		if(last[0] % 2 == 0){
 			//check if bottom or top
 			if(last[0] == 0){
-				return getLines(last[0],last[1]+1);
-			}
-			else if(last[0] == 9){
-				return getLines(last[0],last[1]-1);
-			}
-			else{
-				return Math.max(getLines(last[0],last[1]+1), getLines(last[0],last[1]-1));
-			}
-		}
-		else{
-			//check if left or right
-			if(last[0] == 0){
 				return getLines(last[0]+1,last[1]);
 			}
-			else if(last[0] == 9){
+			else if(last[0] == 18){
 				return getLines(last[0]-1,last[1]);
 			}
 			else{
 				return Math.max(getLines(last[0]+1,last[1]), getLines(last[0]-1,last[1]));
+			}
+		}
+		else{
+			//check if left or right
+			if(last[1] == 0){
+				return getLines(last[0],last[1]+1);
+			}
+			else if(last[1] == 18){
+				return getLines(last[0],last[1]-1);
+			}
+			else{
+				return Math.max(getLines(last[0],last[1]+1), getLines(last[0],last[1]-1));
 			}
 		}
 	}
