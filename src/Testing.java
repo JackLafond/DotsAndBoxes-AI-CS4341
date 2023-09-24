@@ -47,12 +47,25 @@ public class Testing {
         b2.completeMove(2, 1);
         b2.completeMove(1, 4);
         b2.completeMove(5, 2);
+        //b2.completeMove(4,1);
+        //b2.completeMove(1, 6);
+        /**
+        b2.myMove = true;
+        */
+        b2.completeMove(16, 17);
+        //b2.myMove = false;
+        b2.completeMove(18, 15);
+        b2.myMove = true;
+        b2.completeMove(0,9);
+        b2.completeMove(1,6);
         b2.completeMove(4,1);
+        b2.completeMove(16,15);
+        b2.completeMove(17,14);
+        b2.myMove = false;
         b2.printboard();
 
         System.out.println("Board 2 eval: " + b2.evaluate());
-        Minimax2 m2 = new Minimax2();
-        int[] move2 = m2.getBestMove(b2);
+        int[] move2 = Minimax2.getBestMove(b2);
         System.out.println("2 Best move is : " + move2[0] + ", " + move2[1] + " with an eval of : " + move2[2]);
 
 
