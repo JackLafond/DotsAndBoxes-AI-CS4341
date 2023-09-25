@@ -18,6 +18,7 @@ public class Board2 {
 	LinkedList<int[]> madeMoves;
 	int playerscore;
 	int aiscore;
+	int numbMovesLeft;
 	boolean myMove;
 
 	public Board2 (int[][] state, int playerscore, int aiscore, boolean myMove) {
@@ -25,6 +26,7 @@ public class Board2 {
 		this.aiscore = aiscore;
 		this.boardState = state;
 		this.myMove = myMove;
+		this.numbMovesLeft = 180;
 		this.madeMoves = new LinkedList<int[]>();
 	}
 
@@ -129,9 +131,79 @@ public class Board2 {
 		return moves;
 	}
 
+	public List<int[]> getLimitedLegalMoves(int limit) {
+
+		List<int[]> moves = new ArrayList<int[]>();
+		int[] prefOrder = new int[]{3, 1, 0, 2};
+		int prefIx = 0;
+		int curPref = prefOrder[prefIx];
+
+		while(moves.size() < limit) {
+			
+			for(int row = 0; row < 19; row++) {
+
+				if(moves.size() > limit) {
+						break;
+				}
+				boolean shifted = false;
+
+				for(int col = 0; col < 19; col = col + 2) {
+
+					if(moves.size() > limit) {
+						break;
+					}
+					if(row % 2 == 0 && !shifted) {
+						col = col + 1;
+						shifted = true;
+					}
+					if(boardState[row][col] == Board2.EMPTY_LINE) {
+						if(row % 2 == 0) {
+							if(row == 0) {
+								if(getLines(row + 1, col) == curPref) {
+									moves.add(new int[]{row, col, 0});
+								}
+							} else if (row == 18) {
+								if(getLines(row - 1, col) == curPref) {
+									moves.add(new int[]{row, col, 0});
+								}
+							} else {
+								if(getLines(row - 1, col) == curPref || getLines(row + 1, col) == curPref) {
+									moves.add(new int[]{row, col, 0});
+								}
+							}
+						} else {
+							if(col == 0) {
+								if(getLines(row, col + 1) == curPref) {
+									moves.add(new int[]{row, col, 0});
+								}
+							} else if (col == 18) {
+								if(getLines(row, col - 1) == curPref) {
+									moves.add(new int[]{row, col, 0});
+								}
+							} else {
+								if(getLines(row, col - 1) == curPref || getLines(row, col + 1) == curPref) {
+									moves.add(new int[]{row, col, 0});
+								}
+							}
+						}
+					}
+				}
+			}
+
+			prefIx++;
+			if(prefIx > 3) {
+				break;
+			}
+			curPref = prefOrder[prefIx];
+		}
+
+		return moves;
+	}
+
 	public boolean completeMove(int row, int col) {
 
 		boardState[row][col] = Board2.COMPLETED_LINE;
+		numbMovesLeft--;
 		addMadeMove(new int[]{row, col});
 		
 		if(row % 2 == 0) {
@@ -160,6 +232,7 @@ public class Board2 {
 	public boolean undoMove(int row, int col) {
 
 		boardState[row][col] = Board2.EMPTY_LINE;
+		numbMovesLeft++;
 		this.madeMoves.removeLast();
 
 		if(row % 2 == 0) {
