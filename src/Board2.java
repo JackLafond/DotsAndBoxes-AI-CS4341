@@ -16,14 +16,14 @@ public class Board2 {
 
 	int[][] boardState;
 	LinkedList<int[]> madeMoves;
-	int playerscore;
-	int aiscore;
+	int otherscore;
+	int myscore;
 	int numbMovesLeft;
 	boolean myMove;
 
-	public Board2 (int[][] state, int playerscore, int aiscore, boolean myMove) {
-		this.playerscore = playerscore;
-		this.aiscore = aiscore;
+	public Board2 (int[][] state, int otherscore, int myscore, boolean myMove) {
+		this.otherscore = otherscore;
+		this.myscore = myscore;
 		this.boardState = state;
 		this.myMove = myMove;
 		this.numbMovesLeft = 180;
@@ -38,18 +38,12 @@ public class Board2 {
 		return this.boardState;
 	}
 
-	public void updateplayerscore (int score) {
-		this.playerscore += score;
-	}
-
-	public void updateaiscore (int score) {
-		this.aiscore += score;
-	}
-
+	// evaluation function: our score - other score
 	public int evaluate () {
-		return this.aiscore - this.playerscore;
+		return this.myscore - this.otherscore;
 	}
 	
+	// used to print board to console so we can track a game
 	public void printboard() {
 		for (int i = 0; i < BOARD_SIZE * 2 + 1; i++) {
 			for (int j = 0; j < BOARD_SIZE * 2 + 1; j++) {
@@ -86,11 +80,6 @@ public class Board2 {
 		System.out.println();
 	}
 
-
-	public void updatescore (int row, int col, String direction) {
-        
-	}
-
 	public List<int[]> getSortedLegalMoves() {
 
 		List<int[]> moves = new ArrayList<int[]>();
@@ -111,6 +100,7 @@ public class Board2 {
 		return sortMoves(moves);
 	}
 
+	// fucntion to get the next possible moves from the current state of the board
 	public List<int[]> getLegalMoves() {
 
 		List<int[]> moves = new ArrayList<int[]>();
@@ -118,10 +108,14 @@ public class Board2 {
 		for(int row = 0; row < 19; row++) {
 			boolean shifted = false;
 			for(int col = 0; col < 19; col = col + 2) {
+
+				// in our board even number rows hold dots, need to adjust for that
                 if(row % 2 == 0 && !shifted) {
                     col = col + 1;
 					shifted = true;
                 }
+
+				// if the line we hit is empty then add it to list of possible moves
 				if(boardState[row][col] == Board2.EMPTY_LINE) {
 					moves.add(new int[]{row, col, 0});
 				}
@@ -131,6 +125,8 @@ public class Board2 {
 		return moves;
 	}
 
+	// huerisitc function to get legal moves with a limit on size
+	// preference towards 3 filled and 1 filled boxes first, then 0s, then 2s
 	public List<int[]> getLimitedLegalMoves(int limit) {
 
 		List<int[]> moves = new ArrayList<int[]>();
@@ -138,10 +134,12 @@ public class Board2 {
 		int prefIx = 0;
 		int curPref = prefOrder[prefIx];
 
+		// keep filling while we havent hit limit yet
 		while(moves.size() < limit) {
 			
 			for(int row = 0; row < 19; row++) {
 
+				// check size
 				if(moves.size() > limit) {
 						break;
 				}
@@ -152,10 +150,15 @@ public class Board2 {
 					if(moves.size() > limit) {
 						break;
 					}
+
+					// shift if even row
 					if(row % 2 == 0 && !shifted) {
 						col = col + 1;
 						shifted = true;
 					}
+
+					// if we hit an empty line, check its surrounding boxes for how many lines it has
+					// if the box matches our current priority then add it to list
 					if(boardState[row][col] == Board2.EMPTY_LINE) {
 						if(row % 2 == 0) {
 							if(row == 0) {
@@ -190,6 +193,7 @@ public class Board2 {
 				}
 			}
 
+			// if we havent hit limit yet then iterate our current preference, checking that we havent ran out of preferences
 			prefIx++;
 			if(prefIx > 3) {
 				break;
@@ -200,12 +204,16 @@ public class Board2 {
 		return moves;
 	}
 
+	// method used to make a move on a board where row and col is the location of the line in our 19 x 19 matrix 
+	// returns true if a box is completed
 	public boolean completeMove(int row, int col) {
 
+		// set the lne to a completed line, reduce number of moves left, and add the last made move to our list of made moves
 		boardState[row][col] = Board2.COMPLETED_LINE;
 		numbMovesLeft--;
 		addMadeMove(new int[]{row, col});
 		
+		// if row is even, line is horizontal, check boxes above and below (keeping in mind the first and last row of the matrix)
 		if(row % 2 == 0) {
 			if(row == 0) {
 				return checkBox(row+1, col);
@@ -216,6 +224,8 @@ public class Board2 {
 				boolean b = checkBox(row-1, col);
 				return a || b;
 			}
+
+		// if row is odd, line is vertical, check boxes left and right of it (keep in mind first and last column)
 		} else {
 			if(col == 0) {
 				return checkBox(row, col+1);
@@ -229,12 +239,16 @@ public class Board2 {
 		}
 	}
 
+	// method to undo a move, row and col is the location of the line to undo in our 19 x 19 matrix
+	// returns true if a box is no longer complete as a result of taking back the move
 	public boolean undoMove(int row, int col) {
 
+		// set line to empty, increase the number of moves still available, remove the last move in our list of made moves
 		boardState[row][col] = Board2.EMPTY_LINE;
 		numbMovesLeft++;
 		this.madeMoves.removeLast();
 
+		// if row even, line is horizontal, check boxes above and below (keep in mind first and last row)
 		if(row % 2 == 0) {
 			if(row == 0) {
 				return undoBox(row+1, col);
@@ -245,6 +259,8 @@ public class Board2 {
 				boolean b = undoBox(row-1, col);
 				return a || b;
 			}
+
+		// if row is odd, line is vertical, check boxes left and right (keep in mind first and last column)
 		} else {
 			if(col == 0) {
 				return undoBox(row, col+1);
@@ -258,16 +274,26 @@ public class Board2 {
 		}
 	}
 
+	// function to check if a box is complete where row and column is the location of the center of the box in our 19 x 19 matrix
+	// returns true if a box is complete, else false
 	public boolean checkBox(int row, int col) {
+
+		// check if box is not completed, if so check its lines (can use sum of values around the box)
 		if(boardState[row][col] == Board2.BLANK_SPACE) {
 			int sum = boardState[row][col + 1] + boardState[row][col - 1] + boardState[row - 1][col] + boardState[row + 1][col];
+
+			// if the sum is same as 4 complete lines then box is completed, update it
 			if(sum == 4 * Board2.COMPLETED_LINE) {
+
+				// if it was our move then add to our score and set the boxes value to 1
 				if(myMove) {
 					boardState[row][col] = 1;
-					aiscore = aiscore + 1;
+					myscore = myscore + 1;
+
+				// if other player move then update their score and set box value to -1
 				} else {
 					boardState[row][col] = -1;
-					playerscore = playerscore + 1;
+					otherscore = otherscore + 1;
 				}
 				return true;
 			} else {
@@ -277,16 +303,24 @@ public class Board2 {
 		return true;
 	}
 
+	// method to undo a box when a move is undone, where row and col is the location of the center of the box in our 19 x 19 matrix
+	// returns true if a box was complete before and is now not compelte, false if it was not complete before
 	public boolean undoBox(int row, int col) {
+
+		// if the box is worth 1, it was our box, set it back to not completed and reduce our score
 		if(boardState[row][col] == 1) {
 			boardState[row][col] = Board2.BLANK_SPACE;
-			aiscore = aiscore - 1;
+			myscore = myscore - 1;
 			return true;
+
+		// if box is worth -1 it was opponent box, set it back to not compelted and reduce opponent score
 		} else if(boardState[row][col] == -1) {
 			boardState[row][col] = Board2.BLANK_SPACE;
-			playerscore = playerscore - 1;
+			otherscore = otherscore - 1;
 			return true;
 		}
+
+		// if it was not worth 1 or -1 it was never complete, return false
 		return false;
 	}
 
@@ -319,6 +353,8 @@ public class Board2 {
 		}
 	}
 
+	// function to get the number of completed lines of a box where i, j is the location of the center of the box in the 19 x 19 matrix
+	// returns the number of completed lines
 	private int getLines(int i, int j) {
 		int countCompleted = 0;
 		if(boardState[i+1][j] == COMPLETED_LINE) countCompleted++;
