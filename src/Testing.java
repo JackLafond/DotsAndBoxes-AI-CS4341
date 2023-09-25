@@ -47,13 +47,14 @@ public class Testing {
         b2.completeMove(2, 1);
         b2.completeMove(1, 4);
         b2.completeMove(5, 2);
-        //b2.completeMove(4,1);
-        //b2.completeMove(1, 6);
+        b2.completeMove(1, 6);
+        b2.completeMove(4,3);
+        b2.myMove = !b2.myMove;
         //b2.completeMove(16,17);
         //b2.completeMove(16,1);
         //b2.completeMove(16, 3);
         //b2.completeMove(18,3);
-        b2.myMove = true;
+        //b2.myMove = true;
         b2.printboard();
 
         System.out.println("Board 2 eval: " + b2.evaluate());
