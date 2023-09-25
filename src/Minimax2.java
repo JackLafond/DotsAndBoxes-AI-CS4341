@@ -70,7 +70,11 @@ public class Minimax2 {
 				}
 				int[] aMove = search(b, depth + 1, b.myMove, alpha, beta, endTime);
 				if(aMove[2] >= bestMaxMove[2]) {
-					bestMaxMove = Arrays.copyOf(aMove, 3);
+					if(depth == 1) {
+						bestMaxMove[2] = aMove[2];
+					} else {
+						bestMaxMove = Arrays.copyOf(aMove, 3);
+					}
 				}
 				alpha = Math.max(bestMaxMove[2], alpha);
 
@@ -105,7 +109,11 @@ public class Minimax2 {
 				}
 				int[] aMove = search(b, depth + 1, b.myMove, alpha, beta, endTime);
 				if(aMove[2] <= bestMinMove[2]) {
-					bestMinMove = Arrays.copyOf(aMove, 3);
+					if(depth == 1) {
+						bestMinMove[2] = aMove[2];
+					} else {
+						bestMinMove = Arrays.copyOf(aMove, 3);
+					}
 				}
 				beta = Math.min(bestMinMove[2], beta);
 
