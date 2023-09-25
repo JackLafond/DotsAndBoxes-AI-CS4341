@@ -1,23 +1,36 @@
+import java.util.Arrays;
 import java.util.List;
 
 // This class handles the AI movements
 public class Minimax2 {
 
-	public Minimax2 () {}
+	public int[] bestOverall;
+	public boolean mySearch;
+
+	public Minimax2 () {
+		this.bestOverall = new int[]{};
+	}
 
 	// Move is called from main to initiate AI Move
-	public static int[] getBestMove(Board2 b) {
+	public int[] getBestMove(Board2 b) {
 
 		// set a time limit
 		long curTime = System.currentTimeMillis();
-		long endTime = curTime + 8000;
+		long endTime = curTime + 10000;
+		this.bestOverall = new int[]{};
+		mySearch = b.myMove;
 		return search(b, 0, b.myMove, Integer.MIN_VALUE, Integer.MAX_VALUE, endTime);
 	
 	}
 
 	// returns an int of size 3 where int[2] is the minimax eval, 
 	// int[0] is the row of the line, and int[1] is the column of the line (in our 19x19 array)
-	public static int[] search(Board2 b, int depth, boolean isMaxing, int alpha, int beta, long endTime) {
+	public int[] search(Board2 b, int depth, boolean isMaxing, int alpha, int beta, long endTime) {
+
+		// return best overall if time is up
+		if(System.currentTimeMillis() >= endTime) {
+			return this.bestOverall;
+		}
 
 		List<int[]> moves;
 
@@ -30,14 +43,17 @@ public class Minimax2 {
 			moves = b.getLimitedLegalMoves((int) (b.numbMovesLeft / Math.pow(2, Double.valueOf(depth - 2))));
 		}
 
-		// terminating criteria: leaf, time is up, or depth too deep
-		if(moves.isEmpty() || System.currentTimeMillis() >= endTime || depth > 6) {
+		// terminating criteria: leaf, or depth too deep
+		if(moves.isEmpty() || depth > 6) {
 			int[] curMove = b.madeMoves.getLast();
 			return new int[]{curMove[0], curMove[1], b.evaluate()};
 		}
 
 		// initialize first mvoe to start comparisons
 		int[] curMove = moves.get(0);
+		if(bestOverall.length == 0) {
+			bestOverall = new int[] {curMove[0], curMove[1], b.myMove? Integer.MIN_VALUE : Integer.MAX_VALUE};
+		}
 		
 		if(isMaxing) {
 
@@ -50,7 +66,7 @@ public class Minimax2 {
 				}
 				int[] aMove = search(b, depth + 1, b.myMove, alpha, beta, endTime);
 				if(aMove[2] >= bestMove[2]) {
-					bestMove = aMove;
+					bestMove = Arrays.copyOf(aMove, 3);
 				}
 				alpha = Math.max(bestMove[2], alpha);
 
@@ -63,6 +79,12 @@ public class Minimax2 {
 					break;
 				}
 			}
+			
+			
+			if(mySearch && bestMove[2] > bestOverall[2]) {
+				bestOverall = Arrays.copyOf(bestMove, 3);
+			}
+			
 			return bestMove;
 
 		} else {
@@ -76,7 +98,7 @@ public class Minimax2 {
 				}
 				int[] aMove = search(b, depth + 1, b.myMove, alpha, beta, endTime);
 				if(aMove[2] <= bestMove[2]) {
-					bestMove = aMove;
+					bestMove = Arrays.copyOf(aMove, 3);
 				}
 				beta = Math.min(bestMove[2], beta);
 
@@ -89,6 +111,14 @@ public class Minimax2 {
 					break;
 				}
 			}
+
+			if(!mySearch && bestMove[2] < bestOverall[2]) {
+				System.out.println("best move : " + bestMove[0] + ", " + bestMove[1] + " eval: " + bestMove[2]);
+				System.out.println("best overall : " + bestOverall[0] + ", " + bestOverall[1] + " eval: " + bestOverall[2]);
+				bestOverall = Arrays.copyOf(bestMove, 3);
+				System.out.println("best overall : " + bestOverall[0] + ", " + bestOverall[1] + " eval: " + bestOverall[2]);
+			}
+			
 			return bestMove;
 		}
 	}
