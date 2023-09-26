@@ -48,7 +48,7 @@ public class Testing {
         b2.completeMove(2, 1);
         b2.completeMove(1, 4);
         b2.completeMove(5, 2);
-        //b2.completeMove(1, 6);
+        b2.completeMove(1, 6);
         //b2.completeMove(4,1);
         //b2.myMove = !b2.myMove;
         //b2.completeMove(16,17);

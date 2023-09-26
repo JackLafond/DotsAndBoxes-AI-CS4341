@@ -19,7 +19,7 @@ public class Minimax {
 		long endTime = curTime + 8000;
 
         List<int[]> children = b.getLegalMoves();
-        int curBest = b.myMove? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        int curBest = Integer.MIN_VALUE;
         int[] bestChild = new int[]{};
 		int childIx = 0;
 
@@ -34,10 +34,10 @@ public class Minimax {
                 b.myMove = !b.myMove;
             }
             int eval = search(b, 1, b.myMove, Integer.MIN_VALUE, Integer.MAX_VALUE, endTime, childIx);
-			System.out.println(eval);
-			if(eval >= curBest) {
+			if(eval > curBest) {
                 int[] temp = Arrays.copyOf(child, 2);
                 bestChild = new int[] {temp[0], temp[1], eval};
+				curBest = eval;
 			}
     
 			b.undoMove(child[0], child[1]);
@@ -55,19 +55,17 @@ public class Minimax {
 
 		// iterative deepening: keep deepening if time limit allows
 		// once we get to a certain depth, begin limiting the amount fo children to be viewed using heuristic 
-		/* 
 		if(depth < 2) {
 			moves = b.getLegalMoves();
 		} else {
 			// limit gets smaller and smaller as we get to deeper depths
 			moves = b.getLimitedLegalMoves((int) (b.numbMovesLeft / Math.pow(2, Double.valueOf(depth - 2))));
 		}
-		*/
 		moves = b.getLegalMoves();
 
 
 		// terminating criteria: leaf, or depth too deep
-		if(moves.isEmpty() || depth > 5) {
+		if(moves.isEmpty() || depth > 3) {
 			return b.evaluate();
 		} 
 		if(System.currentTimeMillis() >= endTime) {
