@@ -18,6 +18,7 @@ public class Minimax {
 		long curTime = System.currentTimeMillis();
 		long endTime = curTime + 8000;
 
+
         List<int[]> children = b.getLegalMoves();
         int curBest = Integer.MIN_VALUE;
         int[] bestChild = new int[]{};
@@ -59,13 +60,12 @@ public class Minimax {
 			moves = b.getLegalMoves();
 		} else {
 			// limit gets smaller and smaller as we get to deeper depths
-			moves = b.getLimitedLegalMoves((int) (b.numbMovesLeft / Math.pow(2, Double.valueOf(depth - 2))));
+			moves = b.getLimitedLegalMoves((int) (b.numbMovesLeft / Math.pow(2, Double.valueOf(depth - 1))));
 		}
-		moves = b.getLegalMoves();
 
 
 		// terminating criteria: leaf, or depth too deep
-		if(moves.isEmpty() || depth > 3) {
+		if(moves.isEmpty() || depth > 5) {
 			return b.evaluate();
 		} 
 		if(System.currentTimeMillis() >= endTime) {
