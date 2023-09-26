@@ -1,12 +1,10 @@
 //Each Board will hold information of the current boardState
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Board2 {
+public class Board {
 
     public static final int DOT = 8;
     public static final int BLANK_SPACE = 0;
@@ -21,7 +19,7 @@ public class Board2 {
 	int numbMovesLeft;
 	boolean myMove;
 
-	public Board2 (int[][] state, int otherscore, int myscore, boolean myMove) {
+	public Board (int[][] state, int otherscore, int myscore, boolean myMove) {
 		this.otherscore = otherscore;
 		this.myscore = myscore;
 		this.boardState = state;
@@ -80,26 +78,6 @@ public class Board2 {
 		System.out.println();
 	}
 
-	public List<int[]> getSortedLegalMoves() {
-
-		List<int[]> moves = new ArrayList<int[]>();
-
-		for(int row = 0; row < 19; row++) {
-			boolean shifted = false;
-			for(int col = 0; col < 19; col = col + 2) {
-                if(row % 2 == 0 && !shifted) {
-                    col = col + 1;
-					shifted = true;
-                }
-				if(boardState[row][col] == Board2.EMPTY_LINE) {
-					moves.add(new int[]{row, col, 0});
-				}
-			}
-		}
-
-		return sortMoves(moves);
-	}
-
 	// fucntion to get the next possible moves from the current state of the board
 	public List<int[]> getLegalMoves() {
 
@@ -116,7 +94,7 @@ public class Board2 {
                 }
 
 				// if the line we hit is empty then add it to list of possible moves
-				if(boardState[row][col] == Board2.EMPTY_LINE) {
+				if(boardState[row][col] == Board.EMPTY_LINE) {
 					moves.add(new int[]{row, col, 0});
 				}
 			}
@@ -159,7 +137,7 @@ public class Board2 {
 
 					// if we hit an empty line, check its surrounding boxes for how many lines it has
 					// if the box matches our current priority then add it to list
-					if(boardState[row][col] == Board2.EMPTY_LINE) {
+					if(boardState[row][col] == Board.EMPTY_LINE) {
 						if(row % 2 == 0) {
 							if(row == 0) {
 								if(getLines(row + 1, col) == curPref) {
@@ -209,7 +187,7 @@ public class Board2 {
 	public boolean completeMove(int row, int col) {
 
 		// set the lne to a completed line, reduce number of moves left, and add the last made move to our list of made moves
-		boardState[row][col] = Board2.COMPLETED_LINE;
+		boardState[row][col] = Board.COMPLETED_LINE;
 		numbMovesLeft--;
 		addMadeMove(new int[]{row, col});
 		
@@ -244,7 +222,7 @@ public class Board2 {
 	public boolean undoMove(int row, int col) {
 
 		// set line to empty, increase the number of moves still available, remove the last move in our list of made moves
-		boardState[row][col] = Board2.EMPTY_LINE;
+		boardState[row][col] = Board.EMPTY_LINE;
 		numbMovesLeft++;
 		this.madeMoves.removeLast();
 
@@ -279,11 +257,11 @@ public class Board2 {
 	public boolean checkBox(int row, int col) {
 
 		// check if box is not completed, if so check its lines (can use sum of values around the box)
-		if(boardState[row][col] == Board2.BLANK_SPACE) {
+		if(boardState[row][col] == Board.BLANK_SPACE) {
 			int sum = boardState[row][col + 1] + boardState[row][col - 1] + boardState[row - 1][col] + boardState[row + 1][col];
 
 			// if the sum is same as 4 complete lines then box is completed, update it
-			if(sum == 4 * Board2.COMPLETED_LINE) {
+			if(sum == 4 * Board.COMPLETED_LINE) {
 
 				// if it was our move then add to our score and set the boxes value to 1
 				if(myMove) {
@@ -309,48 +287,19 @@ public class Board2 {
 
 		// if the box is worth 1, it was our box, set it back to not completed and reduce our score
 		if(boardState[row][col] == 1) {
-			boardState[row][col] = Board2.BLANK_SPACE;
+			boardState[row][col] = Board.BLANK_SPACE;
 			myscore = myscore - 1;
 			return true;
 
 		// if box is worth -1 it was opponent box, set it back to not compelted and reduce opponent score
 		} else if(boardState[row][col] == -1) {
-			boardState[row][col] = Board2.BLANK_SPACE;
+			boardState[row][col] = Board.BLANK_SPACE;
 			otherscore = otherscore - 1;
 			return true;
 		}
 
 		// if it was not worth 1 or -1 it was never complete, return false
 		return false;
-	}
-
-	public int maxLinesOnBox() {
-		int[] last = madeMoves.getLast();
-		//check if vertical or horisontal
-		if(last[0] % 2 == 0){
-			//check if bottom or top
-			if(last[0] == 0){
-				return getLines(last[0]+1,last[1]);
-			}
-			else if(last[0] == 18){
-				return getLines(last[0]-1,last[1]);
-			}
-			else{
-				return Math.max(getLines(last[0]+1,last[1]), getLines(last[0]-1,last[1]));
-			}
-		}
-		else{
-			//check if left or right
-			if(last[1] == 0){
-				return getLines(last[0],last[1]+1);
-			}
-			else if(last[1] == 18){
-				return getLines(last[0],last[1]-1);
-			}
-			else{
-				return Math.max(getLines(last[0],last[1]+1), getLines(last[0],last[1]-1));
-			}
-		}
 	}
 
 	// function to get the number of completed lines of a box where i, j is the location of the center of the box in the 19 x 19 matrix
@@ -362,39 +311,5 @@ public class Board2 {
 		if(boardState[i][j+1] == COMPLETED_LINE) countCompleted++;
 		if(boardState[i][j-1] == COMPLETED_LINE) countCompleted++;
 		return countCompleted;
-	}
-
-	
-	public List<int[]> sortMoves(List<int[]> moveList) {
-        if (moveList.size() > 40) {
-            // Create a custom comparator to sort boards by numLinesOnBox in descending order
-			Comparator<int[]> comparator = (board1, board2) -> {
-        	int priority1 = getPriority(board1);
-        	int priority2 = getPriority(board2);
-        	return Integer.compare(priority2, priority1);
-    	};
-            Collections.sort(moveList, comparator);
-
-            return moveList.subList(0, 40);
-        } else {
-            return moveList;
-        }
-    }
-
-	private int getPriority(int[] move) {
-		completeMove(move[0], move[1]);
-		int maxLinesOnBox = maxLinesOnBox();
-		undoMove(move[0], move[1]);
-
-		if (maxLinesOnBox == 3) {
-			return 0; // Highest priority for 3's
-		} else if (maxLinesOnBox == 1) {
-			return 1; // Next priority for 1's
-		} else if (maxLinesOnBox == 0) {
-			return 2; // Priority for 0's
-		} else {
-			return 3; // Lowest priority for 2's
-		}
-		
 	}
 }

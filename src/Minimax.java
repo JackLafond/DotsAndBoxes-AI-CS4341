@@ -56,8 +56,12 @@ public class Minimax {
 
 		// iterative deepening: keep deepening if time limit allows
 		// once we get to a certain depth, begin limiting the amount fo children to be viewed using heuristic 
-		// limit gets smaller and smaller as we get to deeper depths
-		moves = b.getLimitedLegalMoves((int) (b.numbMovesLeft / Math.pow(2, Double.valueOf(depth - 1))));
+		if(depth < 2) {
+			moves = b.getLegalMoves();
+		} else {
+			// limit gets smaller and smaller as we get to deeper depths
+			moves = b.getLimitedLegalMoves((int) (b.numbMovesLeft / Math.pow(2, Double.valueOf(depth - 1))));
+		}
 
 
 		// terminating criteria: leaf, or depth too deep
