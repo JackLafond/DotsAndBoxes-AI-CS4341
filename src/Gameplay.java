@@ -10,18 +10,17 @@ public class Gameplay {
     public static final String passFile = "dannydevito.pass";
     public static final String endFile = "end_game";
 
-    public static final Path directoryPath = Path.of("C:\\Users\\Aidan\\Desktop\\Intro to AI\\refereeV5\\refereeV5\\refereeV5\\dots_boxes_referee");
+    public static final Path directoryPath = Path.of(System.getProperty("user.dir"));
 
     public static void main(String[] args) throws IOException, InterruptedException {
         boolean gameRunning = true;
         Path dir = directoryPath;
-        //-----------------------------------------
-        System.out.println(dir);
-        //-----------------------------------------
 
         WatchService watchService = FileSystems.getDefault().newWatchService();
 
         dir.register(watchService, StandardWatchEventKinds.ENTRY_CREATE);
+
+        Minimax minimax = new Minimax();
 
 
         //Initializing the array
@@ -41,7 +40,7 @@ public class Gameplay {
         }
 
         //SHOULD IA Move be false here??
-        Board2 gameBoard = new Board2(array, 0, 0, false);
+        Board gameBoard = new Board(array, 0, 0, false);
 
         while(gameRunning){
             WatchKey key = watchService.take();
@@ -58,32 +57,25 @@ public class Gameplay {
                         String fileName = filePath.getFileName().toString();
 
                         if(fileName.equals(goFile)){
-                            //-----------------------------------------
-                            System.out.println("GO File Detected!");
-                            //-----------------------------------------
 
                             String oppMove = fileContents(moveFile);
 
                             if(oppMove.equals("")){
-                                System.out.println("We have first turn");
                                 gameBoard.myMove = true;
                             } else {
                                 gameBoard.myMove = false;
-                                System.out.println("saving opp move");
-                                System.out.println(oppMove);
                                 if(!isPassMove(oppMove)) {
                                     int[] oppCoords = getArrayCoordinates(oppMove);
                                     gameBoard.completeMove(oppCoords[0], oppCoords[1]);
 
-                                    gameBoard.printboard();
+//                                    gameBoard.printboard();
                                 }
                             }
 
-                            System.out.println("calculating move");
                             long startTime = System.nanoTime();
 
                             gameBoard.myMove = true;
-                            int[] moveVals = Minimax2.getBestMove(gameBoard);
+                            int[] moveVals = minimax.getBestMove(gameBoard);
                             int[] ourMove = arrayToBoardCoords(moveVals[0], moveVals[1]);
 
                             String moveString = "dannydevito " + ourMove[0] + "," + ourMove[1] + " " + ourMove[2] + "," + ourMove[3];
@@ -96,28 +88,23 @@ public class Gameplay {
                             //Write to moveFile to end turn
                             overwriteFile(moveFile, moveString);
 
-                            System.out.println("sending move");
                             long endTime = System.nanoTime();
                             long elapsedTimeMs = (endTime - startTime) / 1000000000; // Convert nanoseconds to milliseconds
-                            System.out.println("Elapsed time: " + elapsedTimeMs + " seconds");
 
 
-                            gameBoard.printboard();
+//                            gameBoard.printboard();
 
                         }
                         else if (fileName.equals(passFile)){
 
                             //Pass here, make empty move
 
-                            //-----------------------------------------
-                            System.out.println("PASS File Detected!\n");
-                            //-----------------------------------------
                             gameBoard.myMove = false;
                             String oppMove = fileContents(moveFile);
                             int[] oppCoords = getArrayCoordinates(oppMove);
                             gameBoard.completeMove(oppCoords[0], oppCoords[1]);
 
-                            gameBoard.printboard();
+//                            gameBoard.printboard();
 
                             //Write Empty move to moveFile
                             String passMove = "dannydevito 0,0 0,0";

@@ -12,7 +12,7 @@ public class Minimax {
 	}
 
 	// Move is called from main to initiate AI Move
-	public int[] getBestMove(Board2 b) {
+	public int[] getBestMove(Board b) {
 
 		// set a time limit
 		long curTime = System.currentTimeMillis();
@@ -50,7 +50,7 @@ public class Minimax {
 
 	// returns an int of size 3 where int[2] is the minimax eval, 
 	// int[0] is the row of the line, and int[1] is the column of the line (in our 19x19 array)
-	public int search(Board2 b, int depth, boolean isMaxing, int alpha, int beta, long endTime, int childIx) {
+	public int search(Board b, int depth, boolean isMaxing, int alpha, int beta, long endTime, int childIx) {
 
 		List<int[]> moves;
 
