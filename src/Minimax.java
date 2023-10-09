@@ -18,15 +18,20 @@ public class Minimax {
 		long curTime = System.currentTimeMillis();
 		long endTime = curTime + 8000;
 
-
+		// get imediate children, init current best vals, child, and current child index
         List<int[]> children = b.getLegalMoves();
         int curBest = Integer.MIN_VALUE;
         int[] bestChild = new int[]{};
 		int childIx = 0;
 
+		// iterate through children
         for(int[] child : children) {
+
+			// reset our move, add next childs current best
 			b.myMove = true;
 			curBestMaxesOverall.add(Integer.MIN_VALUE);
+
+			// make a move, check if its still our turn, and set best child if it hasnt been set yet
 			boolean madeBox = b.completeMove(child[0], child[1]);
 			if(bestChild.length == 0) {
 				bestChild = new int[] {child[0], child[1], b.evaluate()};
@@ -34,13 +39,18 @@ public class Minimax {
             if(!madeBox) {
                 b.myMove = !b.myMove;
             }
+
+			// run search for current child
             int eval = search(b, 1, b.myMove, Integer.MIN_VALUE, Integer.MAX_VALUE, endTime, childIx);
+
+			// if search is better than current best update our current bests
 			if(eval > curBest) {
                 int[] temp = Arrays.copyOf(child, 2);
                 bestChild = new int[] {temp[0], temp[1], eval};
 				curBest = eval;
 			}
     
+			// reset board and iterate child
 			b.undoMove(child[0], child[1]);
 			childIx++;
         }
@@ -48,36 +58,33 @@ public class Minimax {
 	
 	}
 
-	// returns an int of size 3 where int[2] is the minimax eval, 
-	// int[0] is the row of the line, and int[1] is the column of the line (in our 19x19 array)
+	// minimax algo, returns an int of the optimal value of the search
 	public int search(Board b, int depth, boolean isMaxing, int alpha, int beta, long endTime, int childIx) {
 
 		List<int[]> moves;
 
-		// iterative deepening: keep deepening if time limit allows
-		// once we get to a certain depth, begin limiting the amount fo children to be viewed using heuristic 
-		if(depth < 2) {
-			moves = b.getLegalMoves();
-		} else {
-			// limit gets smaller and smaller as we get to deeper depths
-			moves = b.getLimitedLegalMoves((int) (b.numbMovesLeft / Math.pow(2, Double.valueOf(depth - 1))));
-		}
+		// huersitic: limit children we view as we get to deeper depths
+		// favor children where we can capture boxes of make boxes of 2
+		moves = b.getLimitedLegalMoves((int) (b.numbMovesLeft / Math.pow(2, Double.valueOf(depth - 1))));
 
 
 		// terminating criteria: leaf, or depth too deep
 		if(moves.isEmpty() || depth > 5) {
 			return b.evaluate();
 		} 
+
+		// terminate if time is over allowed
 		if(System.currentTimeMillis() >= endTime) {
 			return curBestMaxesOverall.get(childIx);
 		}
 
 		if(isMaxing) {
 
+			// init best val
 			int bestMaxVal = Integer.MIN_VALUE;
 			for(int[] move : moves) {
 
-				// make a move, evaluate it, and update current best move, keeping track of whose turn it is
+				// make a move, update whose turn it is, evaluate it, and update current best move as well as alpha
 				boolean madeBox = b.completeMove(move[0], move[1]);
 				if(!madeBox){
 					b.myMove = !b.myMove;
@@ -95,15 +102,17 @@ public class Minimax {
 					break;
 				}
 			}
+			// update current best for the current immediate child
 			curBestMaxesOverall.set(childIx, Math.max(bestMaxVal, curBestMaxesOverall.get(childIx)));
 			return bestMaxVal;
 
 		} else {
 
+			// init best val
 			int bestMinVal = Integer.MAX_VALUE;
 			for(int[] move : moves) {
 
-				// make a move, evaluate it, and update current best move, keeping track of whose turn it is
+				// make a move, update whose turn it is, evaluate it, and update current best move as well as beta
 				boolean madeBox = b.completeMove(move[0], move[1]);
 				if(!madeBox) {
 					b.myMove = !b.myMove;
