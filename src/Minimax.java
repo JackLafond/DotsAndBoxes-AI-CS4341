@@ -61,6 +61,11 @@ public class Minimax {
 	// minimax algo, returns an int of the optimal value of the search
 	public int search(Board b, int depth, boolean isMaxing, int alpha, int beta, long endTime, int childIx) {
 
+		// terminate if time is over allowed
+		if(System.currentTimeMillis() >= endTime) {
+			return curBestMaxesOverall.get(childIx);
+		}
+
 		List<int[]> moves;
 
 		// huersitic: limit children we view as we get to deeper depths
@@ -72,11 +77,6 @@ public class Minimax {
 		if(moves.isEmpty() || depth > 5) {
 			return b.evaluate();
 		} 
-
-		// terminate if time is over allowed
-		if(System.currentTimeMillis() >= endTime) {
-			return curBestMaxesOverall.get(childIx);
-		}
 
 		if(isMaxing) {
 
